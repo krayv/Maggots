@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad8ae25252c40204596867f3929756a0, type: 3}
+  m_Name: BaseInputConfig
+  m_EditorClassIdentifier: 
+  inputEvents:
+  - inputType: 2
+    keyPressType: 0
+    relatedKeys: 7700000011010000
+  - inputType: 3
+    keyPressType: 0
+    relatedKeys: 7300000012010000
+  - inputType: 0
+    keyPressType: 0
+    relatedKeys: 6100000014010000
+  - inputType: 1
+    keyPressType: 0
+    relatedKeys: 6400000013010000
+  - inputType: 5
+    keyPressType: 0
+    relatedKeys: 3c010000
+  - inputType: 4
+    keyPressType: 0
+    relatedKeys: 20000000
