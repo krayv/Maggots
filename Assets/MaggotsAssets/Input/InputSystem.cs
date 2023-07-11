@@ -9,6 +9,8 @@ namespace Maggots
         [SerializeField] private InputsConfiguration config;
 
         public AxisUnityEvent AxisEvent = new();
+        public AxisUnityEvent HorizontalAxisEvent = new();
+        public AxisUnityEvent VerticalAxisEvent = new();
 
         public UnityEvent JumpEvent;
         public UnityEvent FireEvent;
@@ -46,11 +48,18 @@ namespace Maggots
             bool up = inputEvents[InputEventType.Up].UpdateInput();
             bool down = inputEvents[InputEventType.Down].UpdateInput();
 
-            if (right || left || up || down)
+            float x = right.ToFloat() - left.ToFloat();
+            float y = up.ToFloat() - down.ToFloat();
+
+            if(x != 0)
             {
-                float x = right.ToFloat() - left.ToFloat();
-                float y = up.ToFloat() - down.ToFloat();
-                AxisEvent.Invoke(new AxisInputEventArgs(x,y));
+                HorizontalAxisEvent.Invoke(new AxisInputEventArgs(x, 0));
+                AxisEvent.Invoke(new AxisInputEventArgs(x, y));
+            }
+            else if (y != 0)
+            {
+                VerticalAxisEvent.Invoke(new AxisInputEventArgs(0, y));
+                AxisEvent.Invoke(new AxisInputEventArgs(x, y));
             }
         }
 

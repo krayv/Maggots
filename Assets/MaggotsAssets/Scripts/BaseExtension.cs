@@ -11,6 +11,11 @@ namespace Maggots
         {
             return value ? 1f : 0f;
         }
+
+        public static float RadianToAngle(this float value)
+        {
+            return value * 360f;
+        }
     }
 }
 
