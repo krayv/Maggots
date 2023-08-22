@@ -32,7 +32,6 @@ namespace Maggots
         Vector2 rightDownCorner;
 
         private readonly Dictionary<Vector2, Vector2> normals = new();
-        private readonly List<Dictionary<Vector2Int, int>> colliderPaths = new();
 
         public void OnDrawGizmos()
         {
@@ -68,10 +67,13 @@ namespace Maggots
             {
                 spriteRenderer.enabled = false;
                 int i = 0;
+
+                Vector2 center = new(widthUnit * 0.5f, heightUnit * 0.5f);
+
                 foreach (TextureBlock block in textures)
                 {
                     TerrainBlock terrain = Instantiate(terrainBlockPrefab, transform);
-                    terrain.transform.localPosition = block.localPosition;
+                    terrain.transform.localPosition = new Vector2(block.gridPosition.x, block.gridPosition.y) - center;
                     terrain.name = "Block" + i;
                     terrain.SetTexture(block.texture, block.size, this);
                     
@@ -153,8 +155,8 @@ namespace Maggots
                     newTexture.Apply();
                     TextureBlock textureBlock = new();
                     textureBlock.texture = newTexture;
-                    textureBlock.localPosition = PixelToLocalPoint(blockPixelPos);
                     textureBlock.size = new Vector2(blockXWidth, blockYWidth);
+                    textureBlock.gridPosition = new Vector2Int(i, j);
                     textures.Add(textureBlock);
                 }
             }
@@ -171,7 +173,7 @@ namespace Maggots
         private struct TextureBlock
         {
             public Texture2D texture;
-            public Vector2 localPosition;
+            public Vector2Int gridPosition;
             public Vector2 size;
         }
 
@@ -217,8 +219,6 @@ namespace Maggots
             }
         }
 
-
-
         private void DrawGrass(Vector2Int pixel, Gradient gradient, Texture2D texture, Vector2 normal, int radius)
         {
             List<Vector2Int> pixels = GetCirclePixels(pixel, radius);
@@ -256,18 +256,7 @@ namespace Maggots
                 }
             }
             return pixels;
-        }
-        
-
-        private bool IsBoundPixel(Vector2Int pixel, Dictionary<Vector2Int, int> pixels)
-        {
-            Vector2Int north = new(pixel.x, pixel.y + 1);
-            Vector2Int south = new(pixel.x, pixel.y - 1);
-            Vector2Int west = new(pixel.x - 1, pixel.y);
-            Vector2Int east = new(pixel.x + 1, pixel.y);
-
-            return !(pixels.ContainsKey(north) && pixels.ContainsKey(south) && pixels.ContainsKey(west) && pixels.ContainsKey(east));
-        }
+        }    
 
         private void FillRevertable(Texture2D texture, Vector2Int point)
         {
