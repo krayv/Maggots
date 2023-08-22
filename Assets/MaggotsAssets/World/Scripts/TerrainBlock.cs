@@ -12,30 +12,21 @@ namespace Maggots
         [SerializeField] private PolygonCollider2D polygonCollider;
         private Sprite sprite;
 
-        private List<List<Vector2>> paths = new();
+        private readonly List<Dictionary<Vector2Int, Vector2>> paths = new();
 
-        private List<Dictionary<Vector2Int, Color>> coloredPixelsGroups = new();
+        private readonly List<Dictionary<Vector2Int, Color>> coloredPixelsGroups = new();
          
         private Texture2D Texture => sprite.texture;
         private Terrain terrain;
 
-        private readonly int step = 10;
+        private readonly int step = 5;
 
         private float widthUnit => (float)Texture.width / (float)Terrain.PIXELS_PER_UNIT;
         private float heightUnit => (float)Texture.height / (float)Terrain.PIXELS_PER_UNIT;
 
         private float hypUnit = 1f;
 
-        public void Update()
-        {
-            if (Input.GetMouseButton(0))
-            {
-                Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                DestroyTerrain(mousePosition, 30);
-            }
-        }
-
-        private void DestroyTerrain(Vector2 worldPoint, int radius)
+        public void DestroyTerrain(Vector2 worldPoint, int radius)
         {
             Vector2 localPoint = WorldPositionToLocal(worldPoint);
             Vector2 uv = LocalPositionToUV(localPoint);
@@ -157,11 +148,11 @@ namespace Maggots
             }          
         }
 
-        private bool IsSimilar(List<Vector2> p1, List<Vector2> p2)
+        private bool IsSimilar(Dictionary<Vector2Int, Vector2> p1, Dictionary<Vector2Int, Vector2> p2)
         {
-            foreach (Vector2 point in p1)
+            foreach (var point in p1)
             {
-                if (p2.Any(point2 => point2 == point))
+                if (p2.ContainsKey(point.Key))
                 {
                     return true;
                 }
@@ -235,7 +226,12 @@ namespace Maggots
 
             for (i = 0; i < paths.Count; i++)
             {
-                polygonCollider.SetPath(i, paths[i]);            
+                List<Vector2> pointPath = new();
+                foreach (var path in paths[i])
+                {
+                    pointPath.Add(path.Value);
+                }
+                polygonCollider.SetPath(i, pointPath);            
             }
         }
 
@@ -303,29 +299,23 @@ namespace Maggots
                 }
             }
 
-            List<Vector2> localPoints = new();
-            foreach (Vector2Int pixel in borderPixels)
-            {
-                localPoints.Add(PixelToLocalPoint(pixel));
-            }
-
-            paths.Insert(pathIndex, GetColliderPath(localPoints));
+            paths.Insert(pathIndex, GetColliderPath(borderPixels));
         }
 
-        private List<Vector2> GetColliderPath(List<Vector2> points)
+        private Dictionary<Vector2Int, Vector2> GetColliderPath(List<Vector2Int> pixels)
         {
-            List<Vector2> path = new List<Vector2>();
+            Dictionary<Vector2Int, Vector2> path =new();
+            float minDistanceBetweenColliderPoints = 4f;
 
-            float step = 1.41421356237f / Terrain.PIXELS_PER_UNIT * 4;
+            float step = 1.41421356237f * minDistanceBetweenColliderPoints;
 
             step *= step;
 
-
-            foreach (Vector2 point in points)
+            foreach (Vector2Int pixel in pixels)
             {
-                if (path.Count == 0 || (path.Last() - point).sqrMagnitude > step)
+                if (path.Count == 0 || (path.Last().Key - pixel).sqrMagnitude > step)
                 {
-                    path.Add(point);
+                    path[pixel] = PixelToLocalPoint(pixel);
                 }
             }
             return path;
