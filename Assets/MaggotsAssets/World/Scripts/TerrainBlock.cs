@@ -24,17 +24,13 @@ namespace Maggots
         private float widthUnit => (float)Texture.width / (float)Terrain.PIXELS_PER_UNIT;
         private float heightUnit => (float)Texture.height / (float)Terrain.PIXELS_PER_UNIT;
 
+        private float hypUnit = 1f;
 
         public void Update()
         {
             if (Input.GetMouseButton(0))
             {
                 Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                //RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector3.forward);
-                //if (hit)
-                //{
-                //    DestroyTerrain(mousePosition, 30);
-                //}
                 DestroyTerrain(mousePosition, 30);
             }
         }
@@ -43,7 +39,7 @@ namespace Maggots
         {
             Vector2 localPoint = WorldPositionToLocal(worldPoint);
             Vector2 uv = LocalPositionToUV(localPoint);
-            if ((localPoint.magnitude * Terrain.PIXELS_PER_UNIT - Texture.width) > radius)
+            if (localPoint.magnitude > hypUnit)
             {
                 return;
             }
@@ -59,40 +55,28 @@ namespace Maggots
 
             paths.Clear();
             coloredPixelsGroups.Clear();
-
-            SetCollider();
+            SetCollider();           
         }
 
         private List<Vector2Int> GetCirclePixels(Vector2Int pixel, int radius)
         {
-            //int xMaxIndex = pixel.x + radius - 1 < Texture.width ? pixel.x + radius - 1 : Texture.width;
-            //int xMinIndex = pixel.x - radius + 1 >= 0 ? pixel.x - radius + 1 : 0;
-            //int yMaxIndex = pixel.y + radius + 1 < Texture.height ? pixel.y + radius - 1 : Texture.height;
-            //int yMinIndex = pixel.y - radius - 1 >= 0 ? pixel.y - radius + 1 : 0;
-
             List<Vector2Int> pixels = new(Texture.width * Texture.height);
 
-            //int i = 0;
+            int xMaxIndex = pixel.x + radius - 1 < Texture.width ? pixel.x + radius - 1 : Texture.width - 1;
+            int xMinIndex = pixel.x - radius + 1 >= 0 ? pixel.x - radius + 1 : 0;
+            int yMaxIndex = pixel.y + radius + 1 < Texture.height ? pixel.y + radius - 1 : Texture.height - 1;
+            int yMinIndex = pixel.y - radius - 1 >= 0 ? pixel.y - radius + 1 : 0;
 
-            //for (int x = xMinIndex; x <= xMaxIndex; x++)
-            //{
-            //    for (int y = yMinIndex; y <= yMaxIndex; y++)
-            //    {
-            //        if ((new Vector2Int(x, y) - pixel).magnitude <= radius)
-            //        {
-            //            pixels.Add(new Vector2Int(x, y));
-            //            i++;
-            //        }
-            //    }
-            //}
+            int i = 0;
 
-            for (int x = 0; x < Texture.width; x++)
+            for (int x = xMinIndex; x <= xMaxIndex; x++)
             {
-                for (int y = 0; y < Texture.height; y++)
+                for (int y = yMinIndex; y <= yMaxIndex; y++)
                 {
                     if ((new Vector2Int(x, y) - pixel).magnitude <= radius)
                     {
                         pixels.Add(new Vector2Int(x, y));
+                        i++;
                     }
                 }
             }
@@ -129,6 +113,16 @@ namespace Maggots
             this.sprite = sprite;
             this.terrain = terrain;
             SetCollider();
+            hypUnit = size.magnitude / Terrain.PIXELS_PER_UNIT;
+
+            foreach (var pixelsGroup in coloredPixelsGroups)
+            {
+                foreach (var pixelInGroup in pixelsGroup)
+                {
+                    Texture.SetPixel(pixelInGroup.Key.x, pixelInGroup.Key.y, Color.red);
+                }
+            }
+            Texture.Apply();
         }
 
         private void SetCollider()
@@ -139,7 +133,7 @@ namespace Maggots
                 {
                     Color pixel = Texture.GetPixel(x,y);
                     Vector2Int pixelPos = new(x, y);
-                    if (!IsPixelAddedToGroup(pixelPos) &&  pixel != Color.clear)
+                    if (!IsPixelAddedToGroup(pixelPos) && pixel != Color.clear)
                     {                        
                         coloredPixelsGroups.Add(GetColorerPixelGroup(pixelPos));
                     }
@@ -160,12 +154,19 @@ namespace Maggots
                     i++;
                 }
                 RefreshCollider();
-            }
+            }          
         }
 
         private bool IsSimilar(List<Vector2> p1, List<Vector2> p2)
         {
-            return p1.Count == p2.Count;
+            foreach (Vector2 point in p1)
+            {
+                if (p2.Any(point2 => point2 == point))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private bool IsPixelAddedToGroup(Vector2Int pixel)
@@ -217,7 +218,7 @@ namespace Maggots
             {
                 queue.Enqueue(south);
             }
-        }
+        }      
 
         private void RefreshCollider()
         {
@@ -308,7 +309,26 @@ namespace Maggots
                 localPoints.Add(PixelToLocalPoint(pixel));
             }
 
-            paths.Insert(pathIndex, localPoints);
+            paths.Insert(pathIndex, GetColliderPath(localPoints));
+        }
+
+        private List<Vector2> GetColliderPath(List<Vector2> points)
+        {
+            List<Vector2> path = new List<Vector2>();
+
+            float step = 1.41421356237f / Terrain.PIXELS_PER_UNIT * 4;
+
+            step *= step;
+
+
+            foreach (Vector2 point in points)
+            {
+                if (path.Count == 0 || (path.Last() - point).sqrMagnitude > step)
+                {
+                    path.Add(point);
+                }
+            }
+            return path;
         }
 
         private Vector2Int FindBoundPixel(Vector2Int startPixel)
