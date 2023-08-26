@@ -16,6 +16,7 @@ namespace Maggots
         [SerializeField] private int polygonPointsPerCurve = 10;
         [SerializeField] private PolygonCollider2D polygonCollider;
         [SerializeField] private TerrainBlock terrainBlockPrefab;
+        [SerializeField] private float spawnPointMaxDifToUp = 0.1f;
 
         public const int PIXELS_PER_UNIT = 100;
         private BezierCurve2D[] beziers;
@@ -33,27 +34,28 @@ namespace Maggots
 
         private readonly Dictionary<Vector2, Vector2> normals = new();
 
-        public void OnDrawGizmos()
+        private void OnDrawGizmos()
         {
-            Gizmos.DrawLine(leftDownCorner, leftUpCorner);
-            Gizmos.DrawLine(leftUpCorner, rightUpCorner);
-            Gizmos.DrawLine(rightUpCorner, rightDownCorner);
-            Gizmos.DrawLine(rightDownCorner, leftDownCorner);
             foreach (var normal in normals)
             {
-                Gizmos.color = Color.red;
-                Gizmos.DrawLine(normal.Key, normal.Key + normal.Value);
-            }
+                Gizmos.DrawRay(new Ray(UVToWorldPosition(normal.Key), normal.Value));
+            }            
         }
 
-        [ContextMenu("Draw")]
-        public void Draw()
+
+        public List<Vector2> Generate()
         {
             CreateTexture();
-            Debug.Log("leftDownCorner: " + leftDownCorner);
-            Debug.Log("leftUpCorner: " + leftUpCorner);
-            Debug.Log("rightUpCorner: " + rightUpCorner);
-            Debug.Log("rightDownCorner: " + rightDownCorner);
+            List<Vector2> spawnPoints = new();
+            foreach (var normal in normals)
+            {
+                if (Vector2.Dot(normal.Value, Vector2.up) > 1f - spawnPointMaxDifToUp)
+                {
+                    spawnPoints.Add(UVToWorldPosition(normal.Key) + Vector2.up);
+                }
+            }
+
+            return spawnPoints;
         }
 
         private void CreateTexture()
@@ -110,6 +112,9 @@ namespace Maggots
             heightPixels = (int) (heightUnit * PIXELS_PER_UNIT);
 
             Texture2D texture = new(widthPixels, heightPixels);
+
+            Debug.Log(widthPixels + " " + heightPixels);
+
             texture.alphaIsTransparency = true;
             texture.filterMode = FilterMode.Point;
 
@@ -209,12 +214,15 @@ namespace Maggots
                     Vector2 point = curve.GetPointUV(progress);
                     Vector2Int pixelCoor = new((int)(widthPixels * point.x), (int)(heightPixels * point.y));
 
-
                     Vector2 normal = curve.GetNormal(progress);
-                    normals[curve.GetPoint(progress)] = normal;
+                    normals[curve.GetPointUV(progress)] = normal;
 
-                    FillRevertable(texture, pixelCoor + Vector2Int.CeilToInt(-normal * borderSize));
-                    FillRevertable(texture, pixelCoor + Vector2Int.CeilToInt(normal * borderSize));
+                    if (i == 1)
+                    {
+                        Vector2Int p1 = pixelCoor + Vector2Int.CeilToInt(-normal * borderSize);
+                        p1 = new Vector2Int(Mathf.Abs(p1.x), Mathf.Abs(p1.y));
+                        FillRevertable(texture, p1);
+                    }                
                 }               
             }
         }
@@ -359,7 +367,17 @@ namespace Maggots
             return matrix.MultiplyPoint3x4(worldPosition);
         }
 
+        private Vector2 LocalToWorldPosition(Vector2 localPosition)
+        {
+            var matrix = transform.localToWorldMatrix;
+            return matrix.MultiplyPoint3x4(localPosition);
+        }
 
+        private Vector2 UVToWorldPosition(Vector2 uv)
+        {
+            Vector2 localPos = new(uv.x * widthUnit - widthUnit * 0.5f, uv.y * heightUnit - heightUnit * 0.5f);
+            return transform.localToWorldMatrix.MultiplyPoint(localPos);
+        }
 
         private Vector2 PixelToLocalPoint(Vector2Int pixel)
         {

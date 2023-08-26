@@ -74,7 +74,6 @@ namespace Maggots
             return pixels;
         }
 
-
         private Vector2Int UVToPixelPoint(Vector2 uv)
         {
             return new((int)(Texture.width * uv.x), (int)(Texture.height * uv.y));
@@ -96,7 +95,6 @@ namespace Maggots
             return position;
         }
 
-
         public void SetTexture(Texture2D texture, Vector2 size, Terrain terrain)
         {
             Sprite sprite = Sprite.Create(texture, new Rect(0f, 0f, size.x, size.y), default);
@@ -105,15 +103,6 @@ namespace Maggots
             this.terrain = terrain;
             SetCollider();
             hypUnit = size.magnitude / Terrain.PIXELS_PER_UNIT;
-
-            foreach (var pixelsGroup in coloredPixelsGroups)
-            {
-                foreach (var pixelInGroup in pixelsGroup)
-                {
-                    Texture.SetPixel(pixelInGroup.Key.x, pixelInGroup.Key.y, Color.red);
-                }
-            }
-            Texture.Apply();
         }
 
         private void SetCollider()
@@ -298,7 +287,6 @@ namespace Maggots
                     }
                 }
             }
-
             paths.Insert(pathIndex, GetColliderPath(borderPixels));
         }
 
@@ -331,7 +319,6 @@ namespace Maggots
             }
             return nextPixel - move;
         }
-
 
         private bool TryGetPairTransparentNeighborPixel(Vector2Int borderPixel, out Vector2Int transparentPixel1, out Vector2Int transparentPixel2, out Vector2Int directionByBorder, out Vector2Int directionTowardBorder, Vector2Int oldDirection = default)
         {

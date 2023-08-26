@@ -39,7 +39,7 @@ namespace Maggots
         private void OnValidate()
         {
             Generate();
-            terrain.Draw();
+            terrain.Generate();
         }
 
         public void OnDrawGizmos()
@@ -60,7 +60,7 @@ namespace Maggots
            
 
             BezierCurve2D[] curves = new BezierCurve2D[Random.Range(curveCountRange.x, curveCountRange.y + 1)];
-            Vector2 enterPoint = transform.position;
+            Vector2 enterPoint = Vector2.zero;
             Matrix4x4 matrix = Matrix4x4.identity;
             for (int i = 0; i < curves.Length; i++)
             {
@@ -83,26 +83,6 @@ namespace Maggots
                 float startXPosition = enterPoint.x;
                 matrix = GetMatrix((float)i / (float)curves.Length, matrix, enterPoint, ref startXPosition);
 
-                //GameObject p1 = Instantiate(pointSpritePrefab);
-                //p1.name = $"C{i}-P1";
-                //p1.transform.position = curves[i].point1;
-                //p1.transform.parent = transform;
-
-                //GameObject p2 = Instantiate(pointSpritePrefab);
-                //p2.name = $"C{i}-P2";
-                //p2.transform.position = curves[i].point2;
-                //p2.transform.parent = transform;
-
-                //GameObject p3 = Instantiate(pointSpritePrefab);
-                //p3.name = $"C{i}-P3";
-                //p3.transform.position = curves[i].point3;
-                //p3.transform.parent = transform;
-
-                //GameObject p4 = Instantiate(pointSpritePrefab);
-                //p4.name = $"C{i}-P4";
-                //p4.transform.position = curves[i].point4;
-                //p4.transform.parent = transform;
-
                 enterPoint.x = startXPosition;
             }
 
@@ -110,6 +90,11 @@ namespace Maggots
             float RightBorder = curves.ToList().Select(v => v.RightPoint).ToArray().SelectFarthestVector(VectorExtensions.RightVector()).x;
             float UpBorder = curves.ToList().Select(v => v.UpPoint).ToArray().SelectFarthestVector(VectorExtensions.UpVector()).y;
             float DownBorder = curves.ToList().Select(v => v.DownPoint).ToArray().SelectFarthestVector(VectorExtensions.DownVector()).y;
+
+            Debug.Log("LeftBorder " + LeftBorder);
+            Debug.Log("RightBorder " + RightBorder);
+            Debug.Log("UpBorder " + UpBorder);
+            Debug.Log("DownBorder " + DownBorder);
 
             XBorders = new Vector2(LeftBorder, RightBorder);
             YBorders = new Vector2(DownBorder, UpBorder);
@@ -156,7 +141,7 @@ namespace Maggots
         {
             if (currentShapeIndex != shapeIndex)
             {
-                currentMatrix *= Matrix4x4.Translate(transform.position);
+                currentMatrix *= Matrix4x4.Translate(Vector2.zero);
                 shapeIndex = currentShapeIndex;
                 Matrix4x4 matrix = currentMatrix * Matrix4x4.Translate(startPoint);
                 switch (currentShapeIndex)
@@ -182,7 +167,7 @@ namespace Maggots
 
         private void Render(BezierCurve2D[] curves)
         {
-            Vector2 previousPoint = transform.position;
+            Vector2 previousPoint = Vector2.zero;
             foreach (BezierCurve2D curve in curves)
             {
                 float t = 0f;
