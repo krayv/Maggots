@@ -10,46 +10,57 @@ namespace Maggots
         [SerializeField] private float moveForce = 10f;
         [SerializeField] private float jumpForce = 60f;
 
-        private List<RigidbodyMovement> trackedMovements;
+        private List<Maggot> trackedMaggots;
 
         public void Init(InputSystem input)
         {
             inputSystem = input;            
             inputSystem.HorizontalAxisEvent.AddListener(OnHorizontalAxis);
             inputSystem.JumpEvent.AddListener(OnJumpInput);
+            inputSystem.FireEvent.AddListener(OnFireInput);
         }
 
-        public void TrackNewMovement(List<RigidbodyMovement> movements)
+        private void Update()
         {
-            trackedMovements = movements;
+            UpdateMousePosition();
+        }
+
+        private void UpdateMousePosition()
+        {
+            foreach (var maggot in trackedMaggots)
+            {
+                Vector2 direction = Camera.main.ScreenToWorldPoint(Input.mousePosition) - maggot.transform.position;
+                maggot.UpdateWeaponDirection(direction);
+            }
+        }
+
+        public void TrackNewMovement(List<Maggot> maggots)
+        {
+            trackedMaggots = maggots;
         }
 
         public void OnHorizontalAxis(AxisInputEventArgs inputArgs)
         {
-            foreach (var movement in trackedMovements)
+            foreach (var maggot in trackedMaggots)
             {
-                if (movement.IsStayOnGround)
-                {
-                    movement.MoveByDirection(inputArgs.Value, Space.Self, Time.deltaTime * moveForce);
-                }
-                else
-                {
-                    movement.MoveByDirection(inputArgs.Value, Space.World, Time.deltaTime * moveForce);
-                }
+                maggot.Move(inputArgs);
+            }          
+        }
+
+        public void OnFireInput()
+        {
+            foreach (var maggot in trackedMaggots)
+            {
+                maggot.Fire();
             }
-            
         }
 
         public void OnJumpInput()
         {
-            foreach (var movement in trackedMovements)
+            foreach (var maggot in trackedMaggots)
             {
-                if (movement.IsStayOnGround)
-                {
-                    movement.MoveByDirection(Vector2.up, Space.Self, Time.deltaTime * jumpForce, ForceMode2D.Impulse);
-                }
-            }
-                      
+                maggot.Jump();
+            }                      
         }
     }
 }

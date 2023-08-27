@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fed4907aca19c354395e222b719b474e, type: 3}
+  m_Name: Bazooka
+  m_EditorClassIdentifier: 
+  spritePrefab: {fileID: 4498435536623022481, guid: 27a0dd1cec17ed04bbb18ae40c341a95, type: 3}
+  projectile: {fileID: 3498001305427266390, guid: 605737c2dc038964e8ec0a56bc850288, type: 3}
+  ExplosionRadius: 0.5
+  Damage: 35
+  ProjectileStartForce: 100

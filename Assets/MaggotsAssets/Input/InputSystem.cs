@@ -38,7 +38,6 @@ namespace Maggots
             {
                 FireEvent.Invoke();
             }
-
         }
 
         private void CheckAxis()

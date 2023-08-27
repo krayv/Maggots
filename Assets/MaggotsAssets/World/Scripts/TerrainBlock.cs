@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Maggots
 {
-    public class TerrainBlock : MonoBehaviour
+    public class TerrainBlock : MonoBehaviour, IExplodable
     {
 
         [SerializeField] private SpriteRenderer terrainSpriteRenderer;
@@ -26,7 +26,12 @@ namespace Maggots
 
         private float hypUnit = 1f;
 
-        public void DestroyTerrain(Vector2 worldPoint, int radius)
+        public void OnExplosion(Vector2 pointOfExplosion, Weapon source)
+        {
+            DestroyTerrain(pointOfExplosion, (int)(source.ExplosionRadius * Terrain.PIXELS_PER_UNIT / transform.lossyScale.x));
+        }
+
+        private void DestroyTerrain(Vector2 worldPoint, int radius)
         {
             Vector2 localPoint = WorldPositionToLocal(worldPoint);
             Vector2 uv = LocalPositionToUV(localPoint);
@@ -390,6 +395,6 @@ namespace Maggots
             Vector2 localPoint = new((xUV) * widthUnit, (yUV) * heightUnit);
 
             return localPoint;
-        }
+        }       
     }
 }
