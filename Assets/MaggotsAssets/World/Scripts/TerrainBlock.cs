@@ -19,12 +19,33 @@ namespace Maggots
         private Texture2D Texture => sprite.texture;
         private Terrain terrain;
 
-        private readonly int step = 5;
+        private readonly int checkPixelStep = 3;
+        private readonly int boxSizingStep = 5;
 
         private float widthUnit => (float)Texture.width / (float)Terrain.PIXELS_PER_UNIT;
         private float heightUnit => (float)Texture.height / (float)Terrain.PIXELS_PER_UNIT;
 
         private float hypUnit = 1f;
+
+        private List<Box> boxes = new List<Box>();
+
+        private void OnDrawGizmos()
+        {
+            if (gameObject.name == "Block16")
+            {
+                Gizmos.matrix = Matrix4x4.identity;
+                Gizmos.color = Color.red;
+                foreach (var box in boxes)
+                {
+
+                    Gizmos.DrawLine(WorldPositionToLocal(box.LeftDown + (Vector2)transform.position), WorldPositionToLocal(box.LeftUp + (Vector2)transform.position));
+                    Gizmos.DrawLine(WorldPositionToLocal(box.LeftUp + (Vector2)transform.position), WorldPositionToLocal(box.RigthUp + (Vector2)transform.position));
+                    Gizmos.DrawLine(WorldPositionToLocal(box.RigthUp + (Vector2)transform.position), WorldPositionToLocal(box.RightDown + (Vector2)transform.position));
+                    Gizmos.DrawLine(WorldPositionToLocal(box.RightDown + (Vector2)transform.position), WorldPositionToLocal(box.LeftDown + (Vector2)transform.position));
+
+                }
+            }         
+        }
 
         public void OnExplosion(Vector2 pointOfExplosion, Weapon source)
         {
@@ -51,7 +72,7 @@ namespace Maggots
 
             paths.Clear();
             coloredPixelsGroups.Clear();
-            SetCollider();           
+            UpdateCollider();           
         }
 
         private List<Vector2Int> GetCirclePixels(Vector2Int pixel, int radius)
@@ -106,52 +127,56 @@ namespace Maggots
             terrainSpriteRenderer.sprite = sprite;
             this.sprite = sprite;
             this.terrain = terrain;
-            SetCollider();
+            UpdateCollider();
             hypUnit = size.magnitude / Terrain.PIXELS_PER_UNIT;
         }
 
-        private void SetCollider()
+        private void UpdateCollider()
         {
-            for (int x = 0; x < Texture.width - step; x += step)
+            List<List<Vector2Int>> paths = new();
+            boxes.Clear();
+
+            for (int x = 0; x < Texture.width - checkPixelStep; x += checkPixelStep)
             {
-                for (int y = 0; y < Texture.height - step; y += step)
+                for (int y = 0; y < Texture.height - checkPixelStep; y += checkPixelStep)
                 {
                     Color pixel = Texture.GetPixel(x,y);
                     Vector2Int pixelPos = new(x, y);
                     if (!IsPixelAddedToGroup(pixelPos) && pixel != Color.clear)
-                    {                        
-                        coloredPixelsGroups.Add(GetColorerPixelGroup(pixelPos));
+                    {
+                        List<Vector2Int> addedPixels = CreateBoxPolygon(pixelPos, out var box);
+
+                        if (addedPixels.Count > 1)
+                        {
+                            List<Vector2Int> path = new List<Vector2Int>()
+                            {
+                                box.LeftDown,
+                                box.LeftUp,
+                                box.RigthUp,
+                                box.RightDown
+                            };
+                            boxes.Add(box);
+
+                            paths.Add(path);
+
+                            Dictionary<Vector2Int, Color> group = new();
+                            foreach (var addedPixel in addedPixels)
+                            {
+                                group[addedPixel] = Texture.GetPixel(addedPixel);
+                            }
+                            coloredPixelsGroups.Add(group);
+                        }                     
                     }
                 }
             }
-
-            if (!coloredPixelsGroups.Any())
+            if (paths.Count > 0)
             {
-                Destroy(gameObject);
+                SetCollider(paths);
             }
             else
             {
-                int i = 0;
-                
-                foreach (Dictionary<Vector2Int, Color> colorPixel in coloredPixelsGroups)
-                {
-                    SetColliderByPixels(colorPixel.First().Key, i);
-                    i++;
-                }
-                RefreshCollider();
-            }          
-        }
-
-        private bool IsSimilar(Dictionary<Vector2Int, Vector2> p1, Dictionary<Vector2Int, Vector2> p2)
-        {
-            foreach (var point in p1)
-            {
-                if (p2.ContainsKey(point.Key))
-                {
-                    return true;
-                }
-            }
-            return false;
+                Destroy(gameObject);
+            }           
         }
 
         private bool IsPixelAddedToGroup(Vector2Int pixel)
@@ -159,72 +184,70 @@ namespace Maggots
             return coloredPixelsGroups.Any(g => g.ContainsKey(pixel));
         }
 
-        private Dictionary<Vector2Int, Color> GetColorerPixelGroup(Vector2Int startPos)
+        private List<Vector2Int> CreateBoxPolygon(Vector2Int pos, out Box box)
         {
-            Queue<Vector2Int> pixelsToReplace = new();
-
-            pixelsToReplace.Enqueue(startPos);
-
-            Dictionary<Vector2Int, Color> pixelsGroup = new();
-
-            while (pixelsToReplace.Count > 0)
+            List<Vector2Int> pixels = new(Texture.width * Texture.height);
+            box = new();
+            box.LeftDown = pos + new Vector2Int(0,-1);
+            pixels.InsertRange(0, GetPixelsRow(pos, out Vector2Int rightPosition));
+            box.RightDown = rightPosition + new Vector2Int(0, -1);
+            
+            if (pixels.Count == 1)
             {
-                Vector2Int pixel = pixelsToReplace.Dequeue();
-                if (!IsTransparentOrOutOfBounds(pixel, pixelsGroup))
-                {
-                    Vector2Int west = pixel + new Vector2Int(-step, 0); 
-                    Vector2Int east = pixel;
-                    while (!IsTransparentOrOutOfBounds(west, pixelsGroup))
-                    {
-                        pixelsGroup[west] = Texture.GetPixel(west);
-                        west += new Vector2Int(-step, 0);
-                        CheckNorthAndSouth(west, pixelsToReplace, pixelsGroup);
-                    }
-                    while (!IsTransparentOrOutOfBounds(east, pixelsGroup))
-                    {
-                        pixelsGroup[east] = Texture.GetPixel(east);
-                        east += new Vector2Int(step, 0);
-                        CheckNorthAndSouth(east, pixelsToReplace, pixelsGroup);
-                    }
-                }            
+                return pixels;
             }
-            return pixelsGroup;
+
+            Vector2Int rightBound = rightPosition;
+
+            Vector2Int currentStartPos = pos + new Vector2Int(0, 1);
+            List<Vector2Int> row = GetPixelsRow(pos + Vector2Int.up, out rightPosition);
+            while (rightPosition.x == rightBound.x && currentStartPos.y < Texture.height)
+            {
+                pixels.InsertRange(pixels.Count - 1, row);
+                row = GetPixelsRow(currentStartPos, out rightPosition);
+                currentStartPos += new Vector2Int(0, boxSizingStep);
+            }
+
+            box.LeftUp = new Vector2Int(pos.x, rightPosition.y - 1);
+            box.RigthUp = new Vector2Int(rightBound.x, rightPosition.y - 1);
+          
+            return pixels;
         }
 
-        private void CheckNorthAndSouth(Vector2Int start, Queue<Vector2Int> queue, Dictionary<Vector2Int, Color> addedPixels)
+        private List<Vector2Int> GetPixelsRow(Vector2Int pos, out Vector2Int rightPosition)
         {
-            Vector2Int north = start + new Vector2Int(0, step);
-            if (!IsTransparentOrOutOfBounds(north, addedPixels))
+            List<Vector2Int> row = new(Texture.width);
+            Vector2Int currentPos = pos;
+            rightPosition = pos;
+            row.Add(pos);
+            for (int x = pos.x + boxSizingStep; x < Texture.width; x++)
             {
-                queue.Enqueue(north);
+                Vector2Int newPos = currentPos + Vector2Int.right;
+                rightPosition = currentPos;
+                if (!IsTransparentOrOutOfBounds(newPos))
+                {
+                    row.Add(currentPos);
+                    currentPos = newPos;
+                }
             }
-            Vector2Int south = start + new Vector2Int(0, -step);
-            if (!IsTransparentOrOutOfBounds(south, addedPixels))
-            {
-                queue.Enqueue(south);
-            }
-        }      
+            return row;
+        }
 
-        private void RefreshCollider()
+        private struct Box
+        {
+           public Vector2Int LeftDown, LeftUp, RigthUp, RightDown; 
+        }
+    
+        private void SetCollider(List<List<Vector2Int>> paths)
         {
             polygonCollider.pathCount = paths.Count;
-            int i = 0;
-            while (i < paths.Count - 1)
-            {
-                if (IsSimilar(paths[i], paths[i + 1]))
-                {
-                    paths.Remove(paths[i + 1]);
-                }
-                i++;
-            }
-
-            for (i = 0; i < paths.Count; i++)
+            for (int i = 0; i < paths.Count; i++)
             {
                 List<Vector2> pointPath = new();
-                foreach (var path in paths[i])
+                foreach (var pathPoint in paths[i])
                 {
-                    pointPath.Add(path.Value);
-                }
+                    pointPath.Add(PixelToLocalPoint(pathPoint));
+                }            
                 polygonCollider.SetPath(i, pointPath);            
             }
         }
@@ -232,159 +255,6 @@ namespace Maggots
         private bool IsTransparentOrOutOfBounds(Vector2Int pixel)
         {
             return pixel.IsOutOfBounds(Texture) || Texture.GetPixel(pixel) == Color.clear;
-        }
-
-        private bool IsTransparentOrOutOfBounds(Vector2Int pixel, Dictionary<Vector2Int, Color> exceptions)
-        {
-            return pixel.IsOutOfBounds(Texture) || Texture.GetPixel(pixel) == Color.clear || exceptions.ContainsKey(pixel);
-        }
-
-        private Vector2Int[] GetNeighbors(Vector2Int pixel)
-        {
-            Vector2Int north = new(pixel.x, pixel.y + 1);
-            Vector2Int east = new(pixel.x + 1, pixel.y);
-            Vector2Int south = new(pixel.x, pixel.y - 1);
-            Vector2Int west = new(pixel.x - 1, pixel.y);
-
-            return new Vector2Int[] { north, east, south, west };
-        }
-
-        private void SetColliderByPixels(Vector2Int shapePixel, int pathIndex = 0)
-        {
-            Vector2Int borderPixel = FindBoundPixel(shapePixel);
-            Vector2Int v1, v2, v3;
-            Vector2Int p1, p2;
-            List<Vector2Int> borderPixels = new((int)(Terrain.PIXELS_PER_UNIT * widthUnit * 2 + Terrain.PIXELS_PER_UNIT * heightUnit * 2));
-            if (TryGetPairTransparentNeighborPixel(borderPixel, out p1, out p2, out v1, out v2))
-            {
-                borderPixels.Add(p1);
-                borderPixels.Add(p2);
-                Vector2Int startPixel = p1;
-                v3 = v1;
-                while (p2 != startPixel)
-                {
-                    Vector2Int p3 = p2 + v2;
-                    if (IsTransparentOrOutOfBounds(p3))
-                    {
-                        p1 = p2;
-                        p2 = p3;
-                        Vector2Int v4 = v2;
-                        v3 = v1;
-                        v2 = -v1;
-                        v1 = v4;
-                        borderPixels.Add(p2);
-                    }
-                    else
-                    {
-                        p3 = p2 + v1;
-                        if (IsTransparentOrOutOfBounds(p3))
-                        {
-                            p1 = p2;
-                            p2 += v1;
-                        }
-                        else
-                        {
-                            p1 = p2;
-                            TryGetPairTransparentNeighborPixel(p3, p1, out p2, out v1, out v2, v3);
-                            borderPixels.Add(p2);
-
-                        }
-                    }
-                }
-            }
-            paths.Insert(pathIndex, GetColliderPath(borderPixels));
-        }
-
-        private Dictionary<Vector2Int, Vector2> GetColliderPath(List<Vector2Int> pixels)
-        {
-            Dictionary<Vector2Int, Vector2> path =new();
-            float minDistanceBetweenColliderPoints = 4f;
-
-            float step = 1.41421356237f * minDistanceBetweenColliderPoints;
-
-            step *= step;
-
-            foreach (Vector2Int pixel in pixels)
-            {
-                if (path.Count == 0 || (path.Last().Key - pixel).sqrMagnitude > step)
-                {
-                    path[pixel] = PixelToLocalPoint(pixel);
-                }
-            }
-            return path;
-        }
-
-        private Vector2Int FindBoundPixel(Vector2Int startPixel)
-        {
-            Vector2Int move = new Vector2Int(1, 0);
-            Vector2Int nextPixel = startPixel + move;
-            while (!IsTransparentOrOutOfBounds(nextPixel))
-            {
-                nextPixel += move;
-            }
-            return nextPixel - move;
-        }
-
-        private bool TryGetPairTransparentNeighborPixel(Vector2Int borderPixel, out Vector2Int transparentPixel1, out Vector2Int transparentPixel2, out Vector2Int directionByBorder, out Vector2Int directionTowardBorder, Vector2Int oldDirection = default)
-        {
-            Vector2Int[] directions = GetNeighbors(borderPixel);
-            for (int i = 0; i < directions.Length; i++)
-            {
-                if (IsTransparentOrOutOfBounds(directions[i]))
-                {
-                    if (TryGetPairTransparentNeighborPixel(borderPixel, directions[i], out transparentPixel2, out directionByBorder, out directionTowardBorder, oldDirection))
-                    {
-                        transparentPixel1 = directions[i];
-                        return true;
-                    }
-                }
-            }
-            transparentPixel1 = default;
-            transparentPixel2 = default;
-            directionTowardBorder = default;
-            directionByBorder = default;
-            return false;
-        }
-
-        private bool TryGetPairTransparentNeighborPixel(Vector2Int borderPixel, Vector2Int startTransparentPixel1, out Vector2Int transparentPixel2, out Vector2Int directionByBorder, out Vector2Int directionTowardBorder, Vector2Int oldDirection = default)
-        {
-            directionTowardBorder = borderPixel - startTransparentPixel1;
-            Vector2Int directionToNeighborPixel = directionTowardBorder.Rotate90Degree(false);
-            if (IsTransparentOrOutOfBounds(startTransparentPixel1 + directionToNeighborPixel))
-            {
-                transparentPixel2 = startTransparentPixel1 + directionToNeighborPixel;
-                directionByBorder = directionToNeighborPixel;
-                return true;
-            }
-
-            directionToNeighborPixel = directionTowardBorder.Rotate90Degree(true);
-            if (IsTransparentOrOutOfBounds(startTransparentPixel1 + directionToNeighborPixel))
-            {
-                transparentPixel2 = startTransparentPixel1 + directionToNeighborPixel;
-                directionByBorder = directionToNeighborPixel;
-                return true;
-            }
-
-            if (IsTransparentOrOutOfBounds(startTransparentPixel1 - directionTowardBorder))
-            {
-                transparentPixel2 = startTransparentPixel1 - directionTowardBorder;
-                directionByBorder = -directionTowardBorder;
-
-                if (oldDirection != default)
-                {
-                    directionTowardBorder = oldDirection;
-                }
-                else
-                {
-                    directionTowardBorder = directionByBorder.Rotate90Degree(true);
-                }
-                return true;
-            }
-
-            transparentPixel2 = default;
-            directionTowardBorder = default;
-            directionByBorder = default;
-            return false;
         }
 
         private Vector2 PixelToLocalPoint(Vector2Int pixel)
