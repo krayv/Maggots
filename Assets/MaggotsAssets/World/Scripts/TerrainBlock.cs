@@ -20,32 +20,12 @@ namespace Maggots
         private Terrain terrain;
 
         private readonly int checkPixelStep = 3;
-        private readonly int boxSizingStep = 5;
+        private readonly int boxSizingStep = 1;
 
         private float widthUnit => (float)Texture.width / (float)Terrain.PIXELS_PER_UNIT;
         private float heightUnit => (float)Texture.height / (float)Terrain.PIXELS_PER_UNIT;
 
         private float hypUnit = 1f;
-
-        private List<Box> boxes = new List<Box>();
-
-        private void OnDrawGizmos()
-        {
-            if (gameObject.name == "Block16")
-            {
-                Gizmos.matrix = Matrix4x4.identity;
-                Gizmos.color = Color.red;
-                foreach (var box in boxes)
-                {
-
-                    Gizmos.DrawLine(WorldPositionToLocal(box.LeftDown + (Vector2)transform.position), WorldPositionToLocal(box.LeftUp + (Vector2)transform.position));
-                    Gizmos.DrawLine(WorldPositionToLocal(box.LeftUp + (Vector2)transform.position), WorldPositionToLocal(box.RigthUp + (Vector2)transform.position));
-                    Gizmos.DrawLine(WorldPositionToLocal(box.RigthUp + (Vector2)transform.position), WorldPositionToLocal(box.RightDown + (Vector2)transform.position));
-                    Gizmos.DrawLine(WorldPositionToLocal(box.RightDown + (Vector2)transform.position), WorldPositionToLocal(box.LeftDown + (Vector2)transform.position));
-
-                }
-            }         
-        }
 
         public void OnExplosion(Vector2 pointOfExplosion, Weapon source)
         {
@@ -134,7 +114,7 @@ namespace Maggots
         private void UpdateCollider()
         {
             List<List<Vector2Int>> paths = new();
-            boxes.Clear();
+ 
 
             for (int x = 0; x < Texture.width - checkPixelStep; x += checkPixelStep)
             {
@@ -155,7 +135,6 @@ namespace Maggots
                                 box.RigthUp,
                                 box.RightDown
                             };
-                            boxes.Add(box);
 
                             paths.Add(path);
 

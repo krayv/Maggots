@@ -17,6 +17,7 @@ namespace Maggots
         [SerializeField] private PolygonCollider2D polygonCollider;
         [SerializeField] private TerrainBlock terrainBlockPrefab;
         [SerializeField] private float spawnPointMaxDifToUp = 0.1f;
+        [SerializeField] private int blockSize = 100;
 
         public const int PIXELS_PER_UNIT = 100;
         private BezierCurve2D[] beziers;
@@ -26,11 +27,6 @@ namespace Maggots
 
         private int widthPixels;
         private int heightPixels;
-
-        Vector2 leftDownCorner;
-        Vector2 leftUpCorner;
-        Vector2 rightUpCorner;
-        Vector2 rightDownCorner;
 
         private readonly Dictionary<Vector2, Vector2> normals = new();
 
@@ -75,7 +71,8 @@ namespace Maggots
                 foreach (TextureBlock block in textures)
                 {
                     TerrainBlock terrain = Instantiate(terrainBlockPrefab, transform);
-                    terrain.transform.localPosition = new Vector2(block.gridPosition.x, block.gridPosition.y) - center;
+                    
+                    terrain.transform.localPosition = new Vector2(block.gridPosition.x, block.gridPosition.y) * ((float)blockSize / (float)PIXELS_PER_UNIT) - center;
                     terrain.name = "Block" + i;
                     terrain.SetTexture(block.texture, block.size, this);
                     
@@ -101,10 +98,6 @@ namespace Maggots
             float UpBorder = bezierCurvesGenerator.YBorders.y;
             float DownBorder = bezierCurvesGenerator.YBorders.x;
 
-            leftDownCorner = new(LeftBorder, DownBorder);
-            leftUpCorner = new(LeftBorder, UpBorder);
-            rightUpCorner = new(RightBorder, UpBorder);
-            rightDownCorner = new(RightBorder, DownBorder);
             widthUnit = Mathf.Abs(LeftBorder) + Mathf.Abs(RightBorder);
             heightUnit = Mathf.Abs(DownBorder) + Mathf.Abs(UpBorder);
 
@@ -112,8 +105,6 @@ namespace Maggots
             heightPixels = (int) (heightUnit * PIXELS_PER_UNIT);
 
             Texture2D texture = new(widthPixels, heightPixels);
-
-            Debug.Log(widthPixels + " " + heightPixels);
 
             texture.alphaIsTransparency = true;
             texture.filterMode = FilterMode.Point;
@@ -140,17 +131,17 @@ namespace Maggots
         private List<TextureBlock> SeparateTexture(Texture2D texture)
         {
             List<TextureBlock> textures = new();
-            float xBlocks = Mathf.Ceil((float)texture.width / 100f);
-            float yBlocks = Mathf.Ceil((float)texture.height / 100f);
+            float xBlocks = Mathf.Ceil((float)texture.width / blockSize);
+            float yBlocks = Mathf.Ceil((float)texture.height / blockSize);
             for (int i = 0; i < xBlocks; i++)
             {
                 for (int j = 0; j < yBlocks; j++)
                 {
                     Vector2Int blockPixelPos = BlockCenter(i,j);
-                    int xBlockStart = blockPixelPos.x - 50;
-                    int yBlockStart = blockPixelPos.y - 50;
-                    int blockXWidth = i == xBlocks - 1 ? widthPixels - xBlockStart : 100;
-                    int blockYWidth = j == yBlocks - 1 ? heightPixels - yBlockStart : 100;
+                    int xBlockStart = blockPixelPos.x - blockSize / 2;
+                    int yBlockStart = blockPixelPos.y - blockSize / 2;
+                    int blockXWidth = i == xBlocks - 1 ? widthPixels - xBlockStart : blockSize;
+                    int blockYWidth = j == yBlocks - 1 ? heightPixels - yBlockStart : blockSize;
                     Color[] block = texture.GetPixels(xBlockStart, yBlockStart, blockXWidth, blockYWidth);
 
                     Texture2D newTexture = new(blockXWidth, blockYWidth);
@@ -170,8 +161,9 @@ namespace Maggots
 
         private Vector2Int BlockCenter(int xBlock, int yBlock)
         {
-            int xPos = xBlock < widthUnit ? (xBlock + 1) * 100 - 50 : widthPixels - 50;
-            int yPos = yBlock < heightUnit ? (yBlock + 1) * 100 - 50 : heightPixels - 50;
+            float ratio = (float)PIXELS_PER_UNIT / (float)blockSize;
+            int xPos = xBlock < widthUnit * ratio ? (xBlock + 1) * blockSize - blockSize / 2 : widthPixels - blockSize / 2;
+            int yPos = yBlock < heightUnit * ratio ? (yBlock + 1) * blockSize - blockSize / 2 : heightPixels - blockSize / 2;
             return new Vector2Int(xPos, yPos);
         }
 
