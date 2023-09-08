@@ -6,6 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/MaggotsAssets/Scenes/SampleScene.unity
+    path: Assets/MaggotsAssets/Scenes/Arena.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
+  - enabled: 1
+    path: Assets/MaggotsAssets/Scenes/Start.unity
+    guid: bb126fe54c329a94c869b1d79c39d388
+  - enabled: 1
+    path: Assets/MaggotsAssets/Scenes/Main.unity
+    guid: 194de996df6dfee4ca12e9a31c284628
   m_configObjects: {}

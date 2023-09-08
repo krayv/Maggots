@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Maggots
 {
-    [CreateAssetMenu(fileName ="Weapon", menuName = "MaggotsAssets", order = 0)]
+    [CreateAssetMenu(fileName ="Weapon", menuName = "MaggotsAssets/Weapon", order = 0)]
     public class Weapon : ScriptableObject
     {
         public WeaponSprite spritePrefab;

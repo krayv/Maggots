@@ -15,7 +15,7 @@ namespace Maggots
 
         public Action<Maggot> OnDeath;
 
-        public void Init(GameManager gameController)
+        public void Init(ArenaController gameController)
         {
             gameController.OnChangeSelectedEntity += OnChangeSelection;
             stats.OnZeroLife += OnZeroLife;

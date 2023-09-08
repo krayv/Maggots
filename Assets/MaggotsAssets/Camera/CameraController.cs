@@ -8,7 +8,10 @@ namespace Maggots
 
         private void LateUpdate()
         {
-            transform.position = new Vector3(trackObject.transform.position.x, trackObject.transform.position.y, transform.position.z);
+            if (trackObject != null)
+            {
+                transform.position = new Vector3(trackObject.transform.position.x, trackObject.transform.position.y, transform.position.z);
+            }           
         }
 
         public void TrackNewObject(GameObject track)

@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8250876698309662460
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6009397032639869416}
+  - component: {fileID: 5358635986651197015}
+  m_Layer: 0
+  m_Name: Beziers
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6009397032639869416
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8250876698309662460}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 5.99, y: -7.2399993, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5358635986651197015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8250876698309662460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4984d26deac750243a19f2d2fc12ec57, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxXUnitPerCurve: 1
+  maxYUnitPerCurve: 1
+  xRange: {x: 1, y: 2}
+  yRange: {x: -2, y: 2}
+  curveCountRange: {x: 15, y: 23}
+  pointSpritePrefab: {fileID: 2413180022240903550, guid: a3a56f8f5ffbb0a4ebf27bc34c979046, type: 3}
+  clampX: {x: 0, y: 29}
+  clampY: {x: -10, y: 10}
+  terrain: {fileID: 0}
+  seed: 2147483647

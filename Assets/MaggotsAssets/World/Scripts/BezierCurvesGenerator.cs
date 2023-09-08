@@ -16,8 +16,6 @@ namespace Maggots
         [SerializeField] private Vector2 clampX;
         [SerializeField] private Vector2 clampY;
 
-        [SerializeField] Terrain terrain;
-
         public int seed = 544;
 
         public Vector2 XBorders
@@ -31,34 +29,12 @@ namespace Maggots
             private set;
         }
 
-        private BezierCurve2D[] curves;
-
-
         private int shapeIndex = 0;
 
-        private void OnValidate()
-        {
-            Generate();
-            terrain.Generate();
-        }
-
-        public void OnDrawGizmos()
-        {
-            if (curves == null)
-            {
-                Generate();
-            }
-            else
-            {
-                Render(curves);
-            }
-        }
-        [ContextMenu("Generate")]
-        public BezierCurve2D[] Generate()
+        public BezierCurve2D[] Generate(int seed)
         {
             Random.InitState(seed);
            
-
             BezierCurve2D[] curves = new BezierCurve2D[Random.Range(curveCountRange.x, curveCountRange.y + 1)];
             Vector2 enterPoint = Vector2.zero;
             Matrix4x4 matrix = Matrix4x4.identity;
@@ -91,11 +67,6 @@ namespace Maggots
             float UpBorder = curves.ToList().Select(v => v.UpPoint).ToArray().SelectFarthestVector(VectorExtensions.UpVector()).y;
             float DownBorder = curves.ToList().Select(v => v.DownPoint).ToArray().SelectFarthestVector(VectorExtensions.DownVector()).y;
 
-            Debug.Log("LeftBorder " + LeftBorder);
-            Debug.Log("RightBorder " + RightBorder);
-            Debug.Log("UpBorder " + UpBorder);
-            Debug.Log("DownBorder " + DownBorder);
-
             XBorders = new Vector2(LeftBorder, RightBorder);
             YBorders = new Vector2(DownBorder, UpBorder);
 
@@ -104,7 +75,6 @@ namespace Maggots
                 curves[i].SetBorders(XBorders, YBorders);
             }
             
-            this.curves = curves;
             return curves;
         }
 

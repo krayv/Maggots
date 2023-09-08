@@ -6,7 +6,6 @@ namespace Maggots
 {
     public class Terrain : MonoBehaviour
     {
-        [SerializeField] private BezierCurvesGenerator bezierCurvesGenerator;
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private Vector2 offset;
         [SerializeField] private int normalsPerCurve = 4;
@@ -20,7 +19,9 @@ namespace Maggots
         [SerializeField] private int blockSize = 100;
 
         public const int PIXELS_PER_UNIT = 100;
-        private BezierCurve2D[] beziers;
+        private BezierCurve2D[] curves;
+        private BattleStarter starter;
+
 
         private float widthUnit;
         private float heightUnit;
@@ -30,17 +31,10 @@ namespace Maggots
 
         private readonly Dictionary<Vector2, Vector2> normals = new();
 
-        private void OnDrawGizmos()
+        public List<Vector2> Generate(BattleStarter starter)
         {
-            foreach (var normal in normals)
-            {
-                Gizmos.DrawRay(new Ray(UVToWorldPosition(normal.Key), normal.Value));
-            }            
-        }
-
-
-        public List<Vector2> Generate()
-        {
+            this.starter = starter;
+            this.curves = starter.mapCurves;
             CreateTexture();
             List<Vector2> spawnPoints = new();
             foreach (var normal in normals)
@@ -57,8 +51,7 @@ namespace Maggots
         private void CreateTexture()
         {
             normals.Clear();
-            beziers = GetBeziers();
-            Texture2D texture = DrawLineByBeziers(beziers);
+            Texture2D texture = DrawLineByBeziers(curves);
             List<TextureBlock> textures = SeparateTexture(texture);
           
             if (Application.isPlaying)
@@ -86,17 +79,12 @@ namespace Maggots
             }
         }
 
-        private BezierCurve2D[] GetBeziers()
-        {
-            return bezierCurvesGenerator.Generate();
-        }
-
         private Texture2D DrawLineByBeziers(BezierCurve2D[] beziers)
         {
-            float LeftBorder = bezierCurvesGenerator.XBorders.x;
-            float RightBorder = bezierCurvesGenerator.XBorders.y;
-            float UpBorder = bezierCurvesGenerator.YBorders.y;
-            float DownBorder = bezierCurvesGenerator.YBorders.x;
+            float LeftBorder = starter.mapXBorders.x;
+            float RightBorder = starter.mapXBorders.y;
+            float UpBorder = starter.mapYBorders.y;
+            float DownBorder = starter.mapYBorders.x;
 
             widthUnit = Mathf.Abs(LeftBorder) + Mathf.Abs(RightBorder);
             heightUnit = Mathf.Abs(DownBorder) + Mathf.Abs(UpBorder);
