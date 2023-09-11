@@ -16,37 +16,92 @@ namespace Maggots
         public Action<Maggot> OnDeath;
         public Action<Maggot> OnEndTurn;
 
+        private MaggotBehaviour _stateBehaviour;
+
+        public MaggotState State
+        {
+            get
+            {
+                if (_stateBehaviour is MaggotStateDefault)
+                {
+                    return MaggotState.Default;
+                }
+                if (_stateBehaviour is MaggotStateInAir)
+                {
+                    return MaggotState.InAir;
+                }
+                if (_stateBehaviour is MaggotStateShooting)
+                {
+                    return MaggotState.Shooting;
+                }
+                return default;
+            }
+            set
+            {
+                switch (value)
+                {
+                    case MaggotState.Default:
+                        _stateBehaviour = new MaggotStateDefault(rigidbodyMovement, moveSettings, weapon);
+                        break;
+                    case MaggotState.InAir:
+                        _stateBehaviour = new MaggotStateInAir(rigidbodyMovement, moveSettings, weapon);
+                        break;
+                    case MaggotState.Shooting:
+                        _stateBehaviour = new MaggotStateShooting(rigidbodyMovement, moveSettings, weapon);
+                        break;
+                }
+            }
+        }
+
+        private void Update()
+        {
+            UpdateState();
+        }
+
+        private void UpdateState()
+        {
+            if (State == MaggotState.Shooting)
+            {
+                return;
+            }
+
+            if (!rigidbodyMovement.IsStayOnGround && State == MaggotState.Default)
+            {
+                State = MaggotState.InAir;
+            }
+
+            if (rigidbodyMovement.IsStayOnGround && State == MaggotState.InAir)
+            {
+                State = MaggotState.Default;
+            }
+        }
+
         public void Init(ArenaController gameController)
         {
             gameController.OnChangeSelectedMaggot += OnChangeSelection;
             stats.OnZeroLife += OnZeroLife;
             stats.CurrentLife = stats.MaxLife;
+            State = default;
         }
 
         public void Move(AxisInputEventArgs inputArgs)
         {
-            if (rigidbodyMovement.IsStayOnGround)
-            {
-                rigidbodyMovement.MoveByDirection(inputArgs.Value, Space.Self, Time.deltaTime * moveSettings.HorizontalMoveForce);
-            }
-            else
-            {
-                rigidbodyMovement.MoveByDirection(inputArgs.Value, Space.World, Time.deltaTime * moveSettings.HorizontalMoveForce);
-            }
+            _stateBehaviour.Move(inputArgs);
         }
 
         public void Jump()
         {
-            if (rigidbodyMovement.IsStayOnGround)
-            {
-                rigidbodyMovement.MoveByDirection(Vector2.up, Space.Self, Time.deltaTime * moveSettings.JumpForce, ForceMode2D.Impulse);
-            }
+            _stateBehaviour.Jump();
         }
 
         public void UseWeapon()
         {
-            weapon.onEndUsing += OnEndUsingWeapon;
-            weapon.Use();
+            _stateBehaviour.UseWeapon(OnUseWeapon, OnEndUsingWeapon);
+        }    
+
+        public void UpdateWeaponDirection(Vector2 direction)
+        {
+            _stateBehaviour.UpdateWeaponDirection(direction);
         }
 
         public void OnExplosion(Vector2 pointOfExplosion, Weapon source)
@@ -54,13 +109,16 @@ namespace Maggots
             stats.CurrentLife -= source.Damage;
         }
 
-        public void UpdateWeaponDirection(Vector2 direction)
+        private void OnUseWeapon()
         {
-            weapon.SetDirection(direction);
+            State = MaggotState.Shooting;
+            weapon.onUsing -= OnUseWeapon;
         }
 
         private void OnEndUsingWeapon(bool endTurn)
         {
+            weapon.onEndUsing -= OnEndUsingWeapon;
+            State = MaggotState.Default;
             if (endTurn)
             {
                 OnEndTurn?.Invoke(this);
@@ -110,7 +168,7 @@ namespace Maggots
                     int life = value > MaxLife ? MaxLife : value;
                     if (life != _currentLife)
                     {
-                        //OnChangeLife.Invoke(life);
+                        OnChangeLife?.Invoke(life);
                         if (life <= 0)
                         {
                             OnZeroLife.Invoke();
@@ -125,6 +183,6 @@ namespace Maggots
             public Action<int> OnChangeLife;
             public Action OnZeroLife;
         }
-    }   
+    }
 }
 

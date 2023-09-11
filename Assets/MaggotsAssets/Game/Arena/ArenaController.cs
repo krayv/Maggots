@@ -52,6 +52,7 @@ namespace Maggots
         public void LeaveBattle()
         {
             var task = SceneManager.UnloadSceneAsync(battleStarter.ArenaScene);
+            teams.ForEach(t => t.DestroyAllMaggots());
             currentTeamIndex = 0;
         }
 
