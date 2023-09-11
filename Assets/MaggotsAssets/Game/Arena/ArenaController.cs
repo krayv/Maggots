@@ -12,7 +12,8 @@ namespace Maggots
         private List<Vector2> spawnPoints;
 
         [SerializeField] private Terrain terrain;
-        [SerializeField] private int charactersCount = 2;
+        [SerializeField] private int teamsCount = 2;
+        [SerializeField] private int maggotsPerTeam = 2;
         [SerializeField] private Maggot playerPrefab;
         [SerializeField] private InputSystem inputSystem;       
         [SerializeField] private PlayerController playerController;
@@ -20,12 +21,13 @@ namespace Maggots
         [SerializeField] private ArenaData arenaData;
 
         private CameraController cameraController;
-        private readonly List<Maggot> spawnedPlayers = new();
+        private readonly List<Team> teams = new();
 
-        private int currentEntityIndex = 0;
-        private Maggot CurrentEntity => spawnedPlayers[currentEntityIndex];
+        private int currentTeamIndex = 0;
+        private Team CurrentTeam => teams[currentTeamIndex];
 
-        public Action<Maggot> OnChangeSelectedEntity;
+        public Action<Team> OnChangeTeam;
+        public Action<Maggot> OnChangeSelectedMaggot;
 
         private void Start()
         {
@@ -33,31 +35,24 @@ namespace Maggots
             inputSystem.Init();
             playerController.Init(inputSystem);
             GenerateTerrain();
-            SwitchToNewPlayer();
+            SwitchToNewTeam();
             arenaData.arenaController = this;
         }
 
-        public void NextPlayer()
+        public void NextTurn()
         {
-            if (currentEntityIndex >= spawnedPlayers.Count - 1)
+            currentTeamIndex++;
+            if (currentTeamIndex >= teams.Count)
             {
-                currentEntityIndex = 0;             
+                currentTeamIndex = 0;
             }
-            else
-            {
-                currentEntityIndex++;
-            }
-            SwitchToNewPlayer();
+            SwitchToNewTeam();
         }
 
         public void LeaveBattle()
         {
             var task = SceneManager.UnloadSceneAsync(battleStarter.ArenaScene);
-            currentEntityIndex = 0;
-            foreach (var player in spawnedPlayers)
-            {
-                Destroy(player.gameObject);
-            }
+            currentTeamIndex = 0;
         }
 
         private void GenerateTerrain()
@@ -68,20 +63,29 @@ namespace Maggots
 
         private void SpawnPlayers()
         {
-            for (int i = 0; i < charactersCount; i++)
+            for (int i = 0; i < teamsCount; i++)
             {
-                Maggot maggot = SpawnPlayer(spawnPoints[i]);
-                maggot.Init(this);
-                maggot.OnDeath += OnPlayerDeath;
-                spawnedPlayers.Add(maggot);
-            }
+                List<Maggot> maggots = new();
+                Team team = new(maggots, i);
+                for (int j = 0; j < maggotsPerTeam; j++)
+                {
+                    Maggot maggot = SpawnPlayer(spawnPoints[i]);
+                    maggot.Init(this);
+                    maggot.OnDeath += OnPlayerDeath;
+                    maggot.OnDeath += team.OnPlayerDeath;
+                    maggots.Add(maggot);
+                }
+                teams.Add(team);
+            }            
         }
 
-        private void SwitchToNewPlayer()
+        private void SwitchToNewTeam(bool nextMaggot = false)
         {
-            OnChangeSelectedEntity.Invoke(CurrentEntity);
-            playerController.TrackNewMovement(new List<Maggot>() { CurrentEntity });
-            TrackNewObject(CurrentEntity.gameObject);
+            Maggot currentMaggot = nextMaggot ? CurrentTeam.GetNextMaggot() : CurrentTeam.CurrentMaggot();
+            playerController.TrackNewMovement(new List<Maggot>() { currentMaggot });
+            currentMaggot.OnEndTurn += OnPlayerEndTurn;
+            TrackNewObject(currentMaggot.gameObject);
+            OnChangeSelectedMaggot.Invoke(currentMaggot);
         }
 
         private void TrackNewObject(GameObject newTrackObject)
@@ -96,14 +100,15 @@ namespace Maggots
             return player;
         }
 
+        private void OnPlayerEndTurn(Maggot maggot)
+        {
+            maggot.OnEndTurn -= OnPlayerEndTurn;
+            NextTurn();
+        }
+
         private void OnPlayerDeath(Maggot maggot)
         {
             maggot.OnDeath -= OnPlayerDeath;
-            if (spawnedPlayers.IndexOf(maggot) == currentEntityIndex)
-            {
-                NextPlayer();
-            }
-            spawnedPlayers.Remove(maggot);
         }
     }
 }

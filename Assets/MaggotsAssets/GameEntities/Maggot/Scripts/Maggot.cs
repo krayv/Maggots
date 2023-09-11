@@ -14,10 +14,11 @@ namespace Maggots
         public RigidbodyMovement RigidbodyMovement => rigidbodyMovement;
 
         public Action<Maggot> OnDeath;
+        public Action<Maggot> OnEndTurn;
 
         public void Init(ArenaController gameController)
         {
-            gameController.OnChangeSelectedEntity += OnChangeSelection;
+            gameController.OnChangeSelectedMaggot += OnChangeSelection;
             stats.OnZeroLife += OnZeroLife;
             stats.CurrentLife = stats.MaxLife;
         }
@@ -42,9 +43,10 @@ namespace Maggots
             }
         }
 
-        public void Fire()
+        public void UseWeapon()
         {
-            weapon.Fire();
+            weapon.onEndUsing += OnEndUsingWeapon;
+            weapon.Use();
         }
 
         public void OnExplosion(Vector2 pointOfExplosion, Weapon source)
@@ -55,6 +57,14 @@ namespace Maggots
         public void UpdateWeaponDirection(Vector2 direction)
         {
             weapon.SetDirection(direction);
+        }
+
+        private void OnEndUsingWeapon(bool endTurn)
+        {
+            if (endTurn)
+            {
+                OnEndTurn?.Invoke(this);
+            }
         }
 
         private void OnChangeSelection(Maggot maggot)

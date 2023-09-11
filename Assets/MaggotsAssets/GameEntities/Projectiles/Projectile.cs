@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 namespace Maggots
 {
@@ -7,12 +8,22 @@ namespace Maggots
         [SerializeField] private Rigidbody2D projectileRigidbody;
         [SerializeField] private Collider2D projectileCollider;
 
+        public Action<Projectile> OnExplode;
+
         private Weapon weapon;
 
         public void Init(Weapon weapon)
         {
             projectileRigidbody.AddForce(transform.right * weapon.ProjectileStartForce);
             this.weapon = weapon;
+        }
+
+        private void Update()
+        {
+            if (weapon.MaxUnitDistanceFromCenter * weapon.MaxUnitDistanceFromCenter < transform.position.sqrMagnitude)
+            {
+                Explode();
+            }
         }
 
         private void OnCollisionEnter2D(Collision2D collision)
@@ -29,9 +40,13 @@ namespace Maggots
                     explodable.OnExplosion(transform.position, weapon);
                 }
             }
-
             FXObjectsPool.Instance.PlayFXParticle(FXObjectsPool.FXType.Explosion, transform.position, new Vector2(weapon.ExplosionRadius, weapon.ExplosionRadius));
             Destroy(gameObject);
+        }
+
+        private void OnDestroy()
+        {
+            OnExplode.Invoke(this);
         }
     }
 }

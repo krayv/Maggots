@@ -51,7 +51,7 @@ namespace Maggots
         {
             foreach (var maggot in trackedMaggots)
             {
-                maggot.Fire();
+                maggot.UseWeapon();
             }
         }
 
