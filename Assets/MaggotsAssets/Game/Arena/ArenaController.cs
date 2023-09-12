@@ -64,13 +64,16 @@ namespace Maggots
 
         private void SpawnPlayers()
         {
+            List<int> usedSpawnPoints = new List<int>(); 
             for (int i = 0; i < teamsCount; i++)
             {
                 List<Maggot> maggots = new();
                 Team team = new(maggots, i);
                 for (int j = 0; j < maggotsPerTeam; j++)
                 {
-                    Maggot maggot = SpawnPlayer(spawnPoints[i]);
+                    int indexPos = SelectRandomPointIndex(usedSpawnPoints);
+                    usedSpawnPoints.Add(indexPos);
+                    Maggot maggot = SpawnPlayer(spawnPoints[indexPos]);
                     maggot.Init(this);
                     maggot.OnDeath += OnPlayerDeath;
                     maggot.OnDeath += team.OnPlayerDeath;
@@ -78,6 +81,20 @@ namespace Maggots
                 }
                 teams.Add(team);
             }            
+        }
+
+        private int SelectRandomPointIndex(List<int> usedSpawnPoints)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, spawnPoints.Count);
+            if (usedSpawnPoints.Count == 0 || usedSpawnPoints.Count >= spawnPoints.Count)
+            {
+                return randomIndex;
+            }
+            while (usedSpawnPoints.Any(i=>i == randomIndex))
+            {
+                randomIndex = UnityEngine.Random.Range(0, spawnPoints.Count);
+            }
+            return randomIndex;
         }
 
         private void SwitchToNewTeam(bool nextMaggot = false)
