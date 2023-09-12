@@ -9,11 +9,11 @@ namespace Maggots
 
         [SerializeField] private Vector2 maxSizeRange = new(4f, 25f);
 
-        private Camera localCamera;
+        public Camera LocalCamera;
 
         private void Awake()
         {
-            localCamera = GetComponent<Camera>();
+            LocalCamera = GetComponent<Camera>();
         }
 
         private void LateUpdate()
@@ -25,7 +25,7 @@ namespace Maggots
             
             if (Input.mouseScrollDelta.y != 0f)
             {
-                localCamera.orthographicSize = Mathf.Clamp((localCamera.orthographicSize + Input.mouseScrollDelta.y), maxSizeRange.x, maxSizeRange.y);
+                LocalCamera.orthographicSize = Mathf.Clamp((LocalCamera.orthographicSize + Input.mouseScrollDelta.y), maxSizeRange.x, maxSizeRange.y);
             }
         }
 

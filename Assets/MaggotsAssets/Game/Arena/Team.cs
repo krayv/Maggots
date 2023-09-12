@@ -4,11 +4,21 @@ using UnityEngine;
 
 namespace Maggots
 {
-    public class Team : MonoBehaviour
+    public class Team
     {
         public int number;
+        public string TeamName => "Player " + number;
+        public Color TeamColor = Color.white;
         private int currentMaggotIndex;
-        private List<Maggot> maggots;
+        private readonly List<Maggot> maggots;
+
+        public List<Maggot> Maggots
+        {
+            get
+            {
+                return maggots;
+            }
+        }
 
         public Team(List<Maggot> maggots, int number)
         {
@@ -44,7 +54,7 @@ namespace Maggots
         {
             foreach (var maggot in maggots)
             {
-                Destroy(maggot.gameObject);
+               GameObject.Destroy(maggot.gameObject);
             }
             maggots.Clear();
         }

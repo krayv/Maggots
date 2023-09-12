@@ -36,7 +36,10 @@ namespace Maggots
             playerController.Init(inputSystem);
             GenerateTerrain();
             SwitchToNewTeam();
-            arenaData.arenaController = this;
+            arenaData.ArenaController = this;
+            arenaData.Teams = teams;
+            arenaData.CameraController = cameraController;
+            arenaData.OnNewBattle?.Invoke();
         }
 
         public void NextTurn()
@@ -46,7 +49,7 @@ namespace Maggots
             {
                 currentTeamIndex = 0;
             }
-            SwitchToNewTeam();
+            SwitchToNewTeam(true);
         }
 
         public void LeaveBattle()
@@ -69,6 +72,7 @@ namespace Maggots
             {
                 List<Maggot> maggots = new();
                 Team team = new(maggots, i);
+                team.TeamColor = UnityEngine.Random.ColorHSV();
                 for (int j = 0; j < maggotsPerTeam; j++)
                 {
                     int indexPos = SelectRandomPointIndex(usedSpawnPoints);
@@ -77,6 +81,7 @@ namespace Maggots
                     maggot.Init(this);
                     maggot.OnDeath += OnPlayerDeath;
                     maggot.OnDeath += team.OnPlayerDeath;
+                    maggot.Team = team;
                     maggots.Add(maggot);
                 }
                 teams.Add(team);

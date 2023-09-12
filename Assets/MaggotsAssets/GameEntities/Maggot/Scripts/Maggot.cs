@@ -11,9 +11,15 @@ namespace Maggots
         [SerializeField] private Weapon weaponSO;
         [SerializeField] private MaggotStats stats;
 
+        public Team Team;
+        public string MaggotName => Team.TeamName;
+        public int Health => stats.CurrentLife;
+        public float HealthPercent => stats.CurrentLife / stats.MaxLife;
         public RigidbodyMovement RigidbodyMovement => rigidbodyMovement;
 
         public Action<Maggot> OnDeath;
+        public Action<Maggot> OnDestroyGO;
+        public Action<Maggot> OnChangeLife;
         public Action<Maggot> OnEndTurn;
 
         private MaggotBehaviour _stateBehaviour;
@@ -58,6 +64,11 @@ namespace Maggots
             UpdateState();
         }
 
+        private void OnDestroy()
+        {
+            OnDestroyGO?.Invoke(this);
+        }
+
         private void UpdateState()
         {
             if (State == MaggotState.Shooting)
@@ -81,6 +92,7 @@ namespace Maggots
             gameController.OnChangeSelectedMaggot += OnChangeSelection;
             stats.OnZeroLife += OnZeroLife;
             stats.CurrentLife = stats.MaxLife;
+            stats.OnChangeLife += ChangeLife;
             State = default;
         }
 
@@ -144,6 +156,11 @@ namespace Maggots
             GameObject.Destroy(gameObject);
         }
 
+        private void ChangeLife(int value)
+        {
+            OnChangeLife.Invoke(this);
+        }
+
 
         [Serializable]
         public struct PlayerMovementSettings
@@ -167,13 +184,13 @@ namespace Maggots
                 {
                     int life = value > MaxLife ? MaxLife : value;
                     if (life != _currentLife)
-                    {
-                        OnChangeLife?.Invoke(life);
+                    {                       
                         if (life <= 0)
                         {
                             OnZeroLife.Invoke();
                         }
                         _currentLife = life;
+                        OnChangeLife?.Invoke(life);
                     }
 
                 }
