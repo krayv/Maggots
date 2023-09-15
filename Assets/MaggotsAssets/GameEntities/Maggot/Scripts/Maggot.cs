@@ -6,10 +6,12 @@ namespace Maggots
     public class Maggot : MonoBehaviour, IExplodable
     {
         [SerializeField] private RigidbodyMovement rigidbodyMovement;
-        [SerializeField] private PlayerMovementSettings moveSettings;
+        [SerializeField] private PlayerMovementSettings moveSettings;       
         [SerializeField] private WeaponGameObject weapon;
         [SerializeField] private Weapon weaponSO;
         [SerializeField] private MaggotStats stats;
+        [SerializeField] private SpriteRenderer mainSprite;
+        [SerializeField] private Animator mainAnimator;
 
         public Team Team;
         public string MaggotName => Team.TeamName;
@@ -47,13 +49,13 @@ namespace Maggots
                 switch (value)
                 {
                     case MaggotState.Default:
-                        _stateBehaviour = new MaggotStateDefault(rigidbodyMovement, moveSettings, weapon);
+                        _stateBehaviour = new MaggotStateDefault(rigidbodyMovement, moveSettings, weapon, mainSprite, mainAnimator);
                         break;
                     case MaggotState.InAir:
-                        _stateBehaviour = new MaggotStateInAir(rigidbodyMovement, moveSettings, weapon);
+                        _stateBehaviour = new MaggotStateInAir(rigidbodyMovement, moveSettings, weapon, mainSprite, mainAnimator);
                         break;
                     case MaggotState.Shooting:
-                        _stateBehaviour = new MaggotStateShooting(rigidbodyMovement, moveSettings, weapon);
+                        _stateBehaviour = new MaggotStateShooting(rigidbodyMovement, moveSettings, weapon, mainSprite, mainAnimator);
                         break;
                 }
             }
