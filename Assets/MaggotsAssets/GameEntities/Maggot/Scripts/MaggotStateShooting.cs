@@ -7,11 +7,13 @@ namespace Maggots
 {
     public class MaggotStateShooting : MaggotBehaviour
     {
-        public MaggotStateShooting(RigidbodyMovement movement, Maggot.PlayerMovementSettings settings, WeaponGameObject weapon)
+        public MaggotStateShooting(RigidbodyMovement movement, Maggot.PlayerMovementSettings settings, WeaponGameObject weapon, SpriteRenderer sprite, Animator animator)
         {
             this.movement = movement;
             this.weapon = weapon;
             movementSettings = settings;
+            this.mainSprite = sprite;
+            this.mainAnimator = animator;
         }
 
         public override void Jump()

@@ -7,11 +7,13 @@ namespace Maggots
 {
     public class MaggotStateDefault : MaggotBehaviour
     {
-        public MaggotStateDefault(RigidbodyMovement movement, Maggot.PlayerMovementSettings settings, WeaponGameObject weapon)
+        public MaggotStateDefault(RigidbodyMovement movement, Maggot.PlayerMovementSettings settings, WeaponGameObject weapon, SpriteRenderer sprite, Animator animator)
         {
             this.movement = movement;
             this.weapon = weapon;
             movementSettings = settings;
+            this.mainSprite = sprite;
+            this.mainAnimator = animator;
         }
 
         public override void Jump()
@@ -21,6 +23,14 @@ namespace Maggots
 
         public override void Move(AxisInputEventArgs inputArgs)
         {
+            if (inputArgs.Value.x > 0)
+            {
+                RotateSprite(SpriteOrientation.Right);
+            }
+            if (inputArgs.Value.x < 0)
+            {
+                RotateSprite(SpriteOrientation.Left);
+            }
             movement.MoveByDirection(inputArgs.Value, Space.World, Time.deltaTime * movementSettings.HorizontalMoveForce);
         }
 
