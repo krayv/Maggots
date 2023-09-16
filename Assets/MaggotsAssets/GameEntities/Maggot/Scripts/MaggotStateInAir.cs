@@ -15,14 +15,19 @@ namespace Maggots
             this.mainSprite = sprite;
             this.mainAnimator = animator;
         }
+        public override void DoNothing()
+        {
+            SetTrigger(InAirTrigger);
+        }
 
         public override void Jump()
         {
-
+            SetTrigger(InAirTrigger);
         }
 
         public override void Move(AxisInputEventArgs inputArgs)
         {
+            SetTrigger(InAirTrigger);
             if (inputArgs.Value.x > 0)
             {
                 RotateSprite(SpriteOrientation.Right);

@@ -61,9 +61,23 @@ namespace Maggots
             }
         }
 
+        private bool hasAction;
+
         private void Update()
         {
             UpdateState();
+        }
+
+        private void LateUpdate()
+        {
+            if (hasAction)
+            {
+                hasAction = false;
+            }
+            else
+            {
+                _stateBehaviour.DoNothing();
+            }          
         }
 
         private void OnDestroy()
@@ -100,16 +114,19 @@ namespace Maggots
 
         public void Move(AxisInputEventArgs inputArgs)
         {
+            hasAction = true;
             _stateBehaviour.Move(inputArgs);
         }
 
         public void Jump()
         {
+            hasAction = true;
             _stateBehaviour.Jump();
         }
 
         public void UseWeapon()
         {
+            hasAction = true;
             _stateBehaviour.UseWeapon(OnUseWeapon, OnEndUsingWeapon);
         }    
 

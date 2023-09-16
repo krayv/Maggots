@@ -16,6 +16,11 @@ namespace Maggots
             this.mainAnimator = animator;
         }
 
+        public override void DoNothing()
+        {
+
+        }
+
         public override void Jump()
         {
 

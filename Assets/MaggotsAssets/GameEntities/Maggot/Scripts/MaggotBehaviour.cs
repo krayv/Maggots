@@ -14,6 +14,13 @@ namespace Maggots
         protected Animator mainAnimator;
         protected SpriteOrientation orientation;
 
+        protected readonly string JumpTrigger = "Jump";
+        protected readonly string IdleTrigger = "Idle";
+        protected readonly string WalkTrigger = "Walk";
+        protected readonly string InAirTrigger = "InAir";
+
+        public abstract void DoNothing();
+
         public abstract void Move(AxisInputEventArgs inputArgs);
 
         public abstract void Jump();
@@ -21,6 +28,20 @@ namespace Maggots
         public abstract void UseWeapon(Action onStartUsing, Action<bool> onEndUsing);
 
         public abstract void UpdateWeaponDirection(Vector2 direction);
+
+        protected void SetTrigger(string name)
+        {
+            ResetAllTriggers();
+            mainAnimator.SetTrigger(name);
+        }
+
+        protected void ResetAllTriggers()
+        {
+            mainAnimator.ResetTrigger(JumpTrigger);
+            mainAnimator.ResetTrigger(IdleTrigger);
+            mainAnimator.ResetTrigger(WalkTrigger);
+            mainAnimator.ResetTrigger(InAirTrigger);
+        }
 
         protected void RotateSprite(SpriteOrientation orientation)
         {
