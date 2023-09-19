@@ -25,7 +25,7 @@ namespace Maggots
         private float widthUnit => (float)Texture.width / (float)Terrain.PIXELS_PER_UNIT;
         private float heightUnit => (float)Texture.height / (float)Terrain.PIXELS_PER_UNIT;
 
-        private float hypUnit = 1f;
+        private float hypUnit = 1.44f;
 
         public void OnExplosion(Vector2 pointOfExplosion, Weapon source)
         {
@@ -108,14 +108,13 @@ namespace Maggots
             this.sprite = sprite;
             this.terrain = terrain;
             UpdateCollider();
-            hypUnit = size.magnitude / Terrain.PIXELS_PER_UNIT;
+            hypUnit = size.magnitude / Terrain.PIXELS_PER_UNIT * 3f;
         }
 
         private void UpdateCollider()
         {
             List<List<Vector2Int>> paths = new();
  
-
             for (int x = 0; x < Texture.width - checkPixelStep; x += checkPixelStep)
             {
                 for (int y = 0; y < Texture.height - checkPixelStep; y += checkPixelStep)
