@@ -29,9 +29,14 @@ namespace Maggots
             }
         }
 
+        private Vector2 leftDirectionVector = Vector2.left;
+        private Vector2 rightDirectionVector = Vector2.right;
+
         public bool IsStayOnGround { get; private set; }
 
         private ContactPoint2D groundContact;
+
+        private Vector2 lastDirection;
 
         private void Awake()
         {
@@ -42,14 +47,8 @@ namespace Maggots
         {
             Gizmos.color = Color.red;
             Gizmos.DrawRay((Vector3)groundContact.point + new Vector3(0,0,-1f), groundContact.normal);
-        }
-
-        private void Update()
-        {
-            if (IsStayOnGround)
-            {
-                StandUp();
-            }
+            Gizmos.color = Color.blue;
+            Gizmos.DrawRay((Vector3)transform.position, (Vector3)lastDirection);
         }
 
         public void MoveByDirection(Vector2 direction, Space space = Space.Self, float speed = 1f)
@@ -59,6 +58,8 @@ namespace Maggots
 
         public void MoveByDirection(Vector2 direction, Space space = Space.Self, float speed = 1f, ForceMode2D forceMode = ForceMode2D.Force)
         {
+            lastDirection = direction;
+            
             switch (space)
             {
                 case Space.World:
@@ -89,12 +90,6 @@ namespace Maggots
         private void OnCollisionExit2D(Collision2D collision)
         {
             IsStayOnGround = false;
-        }
-
-        private void StandUp()
-        {
-            Quaternion rotation = Quaternion.FromToRotation(Vector3.up, groundContact.normal);
-            transform.rotation = rotation;
         }
 
         private void OnChangeStatus(MovementStatus newStatus)

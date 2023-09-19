@@ -29,5 +29,5 @@ MonoBehaviour:
     keyPressType: 2
     relatedKeys: 3c01000065000000
   - inputType: 4
-    keyPressType: 0
+    keyPressType: 2
     relatedKeys: 20000000

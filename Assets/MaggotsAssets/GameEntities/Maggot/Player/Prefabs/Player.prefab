@@ -50,8 +50,8 @@ Rigidbody2D:
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 2
-  m_AngularDrag: 0.2
-  m_GravityScale: 1
+  m_AngularDrag: 0
+  m_GravityScale: 2
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -62,7 +62,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!70 &4924173896834920792
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -126,14 +126,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidbodyMovement: {fileID: 395288009808607160}
   moveSettings:
-    JumpForce: 300
-    HorizontalMoveForce: 400
+    JumpForce: 10
+    HorizontalMoveForce: 750
   weapon: {fileID: 2163543135644551798}
   weaponSO: {fileID: 11400000, guid: e651f4333b0158d4f962374644531065, type: 2}
   stats:
     MaxLife: 100
   mainSprite: {fileID: 9173264829138120722}
   mainAnimator: {fileID: 2660825501307031343}
+  capsuleCollider: {fileID: 4924173896834920792}
 --- !u!1 &2122948452578628350
 GameObject:
   m_ObjectHideFlags: 0

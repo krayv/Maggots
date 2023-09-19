@@ -41,6 +41,14 @@ namespace Maggots
 
         public override void UpdateWeaponDirection(Vector2 direction)
         {
+            if (direction.x > 0)
+            {
+                RotateSprite(SpriteOrientation.Right);
+            }
+            if (direction.x < 0)
+            {
+                RotateSprite(SpriteOrientation.Left);
+            }
             weapon.SetDirection(direction);
         }
 

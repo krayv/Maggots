@@ -12,6 +12,7 @@ namespace Maggots
         [SerializeField] private MaggotStats stats;
         [SerializeField] private SpriteRenderer mainSprite;
         [SerializeField] private Animator mainAnimator;
+        [SerializeField] private CapsuleCollider2D capsuleCollider;
 
         public Team Team;
         public string MaggotName => Team.TeamName;
@@ -25,6 +26,8 @@ namespace Maggots
         public Action<Maggot> OnEndTurn;
 
         private MaggotBehaviour _stateBehaviour;
+        private readonly float switchToAirStateDelay = 0.5f;
+        private float currentSwitchDelay;
 
         public MaggotState State
         {
@@ -49,15 +52,16 @@ namespace Maggots
                 switch (value)
                 {
                     case MaggotState.Default:
-                        _stateBehaviour = new MaggotStateDefault(rigidbodyMovement, moveSettings, weapon, mainSprite, mainAnimator);
+                        _stateBehaviour = new MaggotStateDefault(rigidbodyMovement, moveSettings, weapon, mainSprite, mainAnimator, capsuleCollider);
                         break;
                     case MaggotState.InAir:
                         _stateBehaviour = new MaggotStateInAir(rigidbodyMovement, moveSettings, weapon, mainSprite, mainAnimator);
                         break;
                     case MaggotState.Shooting:
                         _stateBehaviour = new MaggotStateShooting(rigidbodyMovement, moveSettings, weapon, mainSprite, mainAnimator);
-                        break;
+                        break;                    
                 }
+                currentSwitchDelay = switchToAirStateDelay;
             }
         }
 
@@ -94,7 +98,14 @@ namespace Maggots
 
             if (!rigidbodyMovement.IsStayOnGround && State == MaggotState.Default)
             {
-                State = MaggotState.InAir;
+                if (currentSwitchDelay > 0f)
+                {
+                    currentSwitchDelay -= Time.deltaTime;
+                }
+                else
+                {
+                    State = MaggotState.InAir;                    
+                }               
             }
 
             if (rigidbodyMovement.IsStayOnGround && State == MaggotState.InAir)
@@ -121,7 +132,7 @@ namespace Maggots
         public void Jump()
         {
             hasAction = true;
-            _stateBehaviour.Jump();
+            _stateBehaviour.Jump();           
         }
 
         public void UseWeapon()

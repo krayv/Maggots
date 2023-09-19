@@ -45,10 +45,6 @@ namespace Maggots
 
         protected void RotateSprite(SpriteOrientation orientation)
         {
-            if (this.orientation == orientation)
-            {
-                return;
-            }
             this.orientation = orientation;
             if (orientation == SpriteOrientation.Left)
             {
