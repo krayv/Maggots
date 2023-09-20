@@ -72,13 +72,13 @@ namespace Maggots
             {
                 if ((left && point.point.x < capsuleCollider.transform.position.x) || (!left && point.point.x < capsuleCollider.transform.position.x))
                 {                      
-                    if (point.point.y > lowestColliderPoint.y && point.point.y > highestPoint.y)
+                    if (point.point.y > lowestColliderPoint.y && point.point.y > highestPoint.y && point.point.y < capsuleCollider.transform.position.y)
                     {
                         highestPoint = point.point;
                     }
                 }
             }
-            if (highestPoint.y < lowestColliderPoint.y + threshold)
+            if (highestPoint.y < lowestColliderPoint.y + threshold || highestPoint.y > capsuleCollider.transform.position.y)
             {
                 return left ? Vector2.left : Vector2.right;
             }
