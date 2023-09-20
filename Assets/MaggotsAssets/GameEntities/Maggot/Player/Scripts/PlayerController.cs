@@ -7,8 +7,6 @@ namespace Maggots
     public class PlayerController : MonoBehaviour
     {     
         [SerializeField] InputSystem inputSystem;
-        [SerializeField] private float moveForce = 10f;
-        [SerializeField] private float jumpForce = 60f;
 
         private List<Maggot> trackedMaggots;
 
@@ -17,7 +15,8 @@ namespace Maggots
             inputSystem = input;            
             inputSystem.HorizontalAxisEvent.AddListener(OnHorizontalAxis);
             inputSystem.JumpEvent.AddListener(OnJumpInput);
-            inputSystem.FireEvent.AddListener(OnFireInput);
+            inputSystem.FireStartEvent.AddListener(OnFireInput);
+            inputSystem.FireReleaseEvent.AddListener(OnReleaseFireInput);
         }
 
         private void Update()
@@ -52,6 +51,14 @@ namespace Maggots
             foreach (var maggot in trackedMaggots)
             {
                 maggot.UseWeapon();
+            }
+        }
+
+        public void OnReleaseFireInput()
+        {
+            foreach (var maggot in trackedMaggots)
+            {
+                maggot.ReleaseFire();
             }
         }
 

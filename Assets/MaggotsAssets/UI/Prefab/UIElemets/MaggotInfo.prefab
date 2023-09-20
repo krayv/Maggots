@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5879656281410183207}
   - component: {fileID: 8465386098449878481}
   m_Layer: 5
-  m_Name: HealthbarBG
+  m_Name: WeaponChargeBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -238,7 +238,7 @@ GameObject:
   - component: {fileID: 8787551093438600310}
   - component: {fileID: 1457938499546912904}
   m_Layer: 5
-  m_Name: HealthbarFill
+  m_Name: WeaponChargeBarFill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

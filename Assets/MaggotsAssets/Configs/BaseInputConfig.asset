@@ -31,3 +31,6 @@ MonoBehaviour:
   - inputType: 4
     keyPressType: 2
     relatedKeys: 20000000
+  - inputType: 6
+    keyPressType: 1
+    relatedKeys: 650000003c010000

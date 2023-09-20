@@ -39,6 +39,11 @@ namespace Maggots
             movement.MoveByDirection(inputArgs.Value, Space.World, Time.deltaTime * movementSettings.HorizontalMoveForce);
         }
 
+        public override void ReleaseFire()
+        {
+            
+        }
+
         public override void UpdateWeaponDirection(Vector2 direction)
         {
             if (direction.x > 0)
@@ -52,7 +57,7 @@ namespace Maggots
             weapon.SetDirection(direction);
         }
 
-        public override void UseWeapon(Action onStartUsing, Action<bool> onEndUsing)
+        public override void UseWeapon(Action onStartCharging, Action onEndCharging, Action onStartUsing, Action<bool> onEndUsing, Action<float> chargeWeaponProgress)
         {
 
         }

@@ -17,5 +17,18 @@ namespace Maggots
             hpText.color = maggot.Team.TeamColor;
             fillbar.SetValue(maggot.HealthPercent);
         }
+
+        public void UpdateCharge(Maggot maggot, float progress)
+        {
+            if (progress <= 0f)
+            {
+                fillbar.gameObject.SetActive(false);
+            }
+            else
+            {
+                fillbar.gameObject.SetActive(true);
+            }
+            fillbar.SetValue(progress);
+        }
     }
 }

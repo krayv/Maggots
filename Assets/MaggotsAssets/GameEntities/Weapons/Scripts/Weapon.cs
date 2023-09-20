@@ -14,10 +14,12 @@ namespace Maggots
         public int Damage = 35;
         public float ProjectileStartForce = 100f;
         public float MaxUnitDistanceFromCenter = 100f;
-        public int ProjectilesCount = 1;
+        public int ProjectilesCount = 1;        
         public bool HasDelayBetweenShoots;
         public float DelayBetweenShoots;
         public bool IsUsingEndsTurn = true;
+        public bool IsChargeble = true;
+        public float ChargingTime = 1.2f;
     }
 }
 

@@ -24,6 +24,7 @@ namespace Maggots
         public Action<Maggot> OnDestroyGO;
         public Action<Maggot> OnChangeLife;
         public Action<Maggot> OnEndTurn;
+        public Action<Maggot, float> OnChargeWeapon;
 
         private MaggotBehaviour _stateBehaviour;
         private readonly float switchToAirStateDelay = 0.5f;
@@ -66,6 +67,7 @@ namespace Maggots
         }
 
         private bool hasAction;
+        private bool blockUsingNewWeapon;
 
         private void Update()
         {
@@ -138,8 +140,14 @@ namespace Maggots
         public void UseWeapon()
         {
             hasAction = true;
-            _stateBehaviour.UseWeapon(OnUseWeapon, OnEndUsingWeapon);
-        }    
+            if(!blockUsingNewWeapon)
+                _stateBehaviour.UseWeapon(OnStartChargingWeapon, OnEndChargingWeapon, OnStartUsingWeapon, OnEndUsingWeapon, OnUpdateChargeWeapon);
+        }
+
+        public void ReleaseFire()
+        {
+            _stateBehaviour.ReleaseFire();
+        }
 
         public void UpdateWeaponDirection(Vector2 direction)
         {
@@ -151,16 +159,35 @@ namespace Maggots
             stats.CurrentLife -= source.Damage;
         }
 
-        private void OnUseWeapon()
+        private void OnStartChargingWeapon()
         {
             State = MaggotState.Shooting;
-            weapon.onUsing -= OnUseWeapon;
+            weapon.onStartCharging -= OnStartChargingWeapon;
+        }
+        
+        private void OnEndChargingWeapon()
+        {
+            State = MaggotState.Default;
+            weapon.onEndCharging -= OnEndChargingWeapon;
+            weapon.onChargeWeapon -= OnUpdateChargeWeapon;
+            OnChargeWeapon.Invoke(this, 0f);
+        }
+
+        private void OnStartUsingWeapon()
+        {
+            blockUsingNewWeapon = true;
+            weapon.onUsing -= OnStartUsingWeapon;
+        }
+
+        private void OnUpdateChargeWeapon(float progress)
+        {
+            OnChargeWeapon.Invoke(this, progress);
         }
 
         private void OnEndUsingWeapon(bool endTurn)
         {
-            weapon.onEndUsing -= OnEndUsingWeapon;
-            State = MaggotState.Default;
+            blockUsingNewWeapon = false;
+            weapon.onEndUsing -= OnEndUsingWeapon;           
             if (endTurn)
             {
                 OnEndTurn?.Invoke(this);

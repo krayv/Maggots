@@ -13,7 +13,8 @@ namespace Maggots
         public AxisUnityEvent VerticalAxisEvent = new();
 
         public UnityEvent JumpEvent;
-        public UnityEvent FireEvent;
+        public UnityEvent FireStartEvent;
+        public UnityEvent FireReleaseEvent;
 
         private readonly Dictionary<InputEventType, InputEvent> inputEvents = new();
         public void Init()
@@ -34,9 +35,14 @@ namespace Maggots
                 JumpEvent.Invoke();
             }
 
-            if (inputEvents[InputEventType.Fire].UpdateInput())
+            if (inputEvents[InputEventType.FireStart].UpdateInput())
             {
-                FireEvent.Invoke();
+                FireStartEvent.Invoke();
+            }
+
+            if (inputEvents[InputEventType.FireRelease].UpdateInput())
+            {
+                FireReleaseEvent.Invoke();
             }
         }
 

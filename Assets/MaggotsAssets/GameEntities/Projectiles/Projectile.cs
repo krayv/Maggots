@@ -12,9 +12,10 @@ namespace Maggots
 
         private Weapon weapon;
 
-        public void Init(Weapon weapon)
+        public void Init(Weapon weapon, float chargeProgress)
         {
-            projectileRigidbody.AddForce(transform.right * weapon.ProjectileStartForce);
+            float force = weapon.IsChargeble ? weapon.ProjectileStartForce * chargeProgress : weapon.ProjectileStartForce;
+            projectileRigidbody.AddForce(transform.right * force);
             this.weapon = weapon;
         }
 

@@ -34,6 +34,7 @@ namespace Maggots
             {
                 info.Key.OnDestroyGO -= OnMaggotDestroy;
                 info.Key.OnChangeLife -= info.Value.UpdateInfo;
+                info.Key.OnChargeWeapon -= info.Value.UpdateCharge;
             }
             infos.Clear();
         }
@@ -59,6 +60,7 @@ namespace Maggots
                     info.UpdateInfo(maggot);
                     maggot.OnDestroyGO += OnMaggotDestroy;
                     maggot.OnChangeLife += info.UpdateInfo;
+                    maggot.OnChargeWeapon += info.UpdateCharge;
                     infos[maggot] = info;
                 }
             }

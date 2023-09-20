@@ -25,7 +25,9 @@ namespace Maggots
 
         public abstract void Jump();
 
-        public abstract void UseWeapon(Action onStartUsing, Action<bool> onEndUsing);
+        public abstract void UseWeapon(Action onStartCharging, Action onEndCharging, Action onStartUsing, Action<bool> onEndUsing, Action<float> chargeWeaponProgress);
+
+        public abstract void ReleaseFire();
 
         public abstract void UpdateWeaponDirection(Vector2 direction);
 

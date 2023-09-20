@@ -102,11 +102,22 @@ namespace Maggots
             weapon.SetDirection(direction);
         }
 
-        public override void UseWeapon(Action onStartUsing, Action<bool> onEndUsing)
+        public override void UseWeapon(Action onStartCharging, Action onEndCharging, Action onStartUsing, Action<bool> onEndUsing, Action<float> chargeWeaponProgress)
         {
             weapon.onUsing += onStartUsing;
             weapon.onEndUsing += onEndUsing;
+            if (weapon.IsChargeble)
+            {
+                weapon.onStartCharging += onStartCharging;
+                weapon.onEndCharging += onEndCharging;
+                weapon.onChargeWeapon += chargeWeaponProgress;
+            }                 
             weapon.Use();
+        }
+
+        public override void ReleaseFire()
+        {
+            
         }
     }
 }

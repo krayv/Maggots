@@ -13,13 +13,47 @@ namespace Maggots
         private WeaponSprite currentSprite;
 
         public Action onUsing;
+        public Action onStartCharging;
+        public Action onEndCharging;
         public Action<bool> onEndUsing;
+        public Action<float> onChargeWeapon;
+
+        public bool IsChargeble => weapon.IsChargeble;
 
         private readonly List<Projectile> projectiles = new();
 
+        private float chargeProgress;
+
         public void Use()
         {
-            onUsing?.Invoke();
+            onUsing?.Invoke();           
+            if (weapon.IsChargeble)
+            {
+                onStartCharging?.Invoke();
+                chargeProgress = 0f;
+            }
+            else
+            {
+                Fire();
+            }          
+        }
+
+        public void UpdateCharge(float time)
+        {
+            chargeProgress += time;
+            if (chargeProgress >= weapon.ChargingTime)
+            {
+                Fire();
+            }
+            onChargeWeapon?.Invoke(chargeProgress / weapon.ChargingTime);
+        }
+
+        public void Fire()
+        {
+            if (weapon.IsChargeble)
+            {
+                onEndCharging?.Invoke();
+            }
             if (!weapon.HasDelayBetweenShoots)
             {
                 for (int i = 0; i < weapon.ProjectilesCount; i++)
@@ -29,8 +63,8 @@ namespace Maggots
             }
             else
             {
-               StartCoroutine(StartShooting());
-            }
+                StartCoroutine(StartShooting());
+            }           
         }
 
         private IEnumerator StartShooting()
@@ -72,7 +106,7 @@ namespace Maggots
         {
             Projectile projectile = Instantiate(projectilePrefab);
             projectile.transform.SetPositionAndRotation(currentSprite.projectileStartPoint.transform.position, weaponSpritePoint.rotation);
-            projectile.Init(weapon);
+            projectile.Init(weapon, chargeProgress / weapon.ChargingTime);
             projectile.OnExplode += OnProjectileExplode;
             projectiles.Add(projectile);
         }
