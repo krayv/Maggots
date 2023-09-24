@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SpritePrefab: {fileID: 4498435536623022481, guid: 27a0dd1cec17ed04bbb18ae40c341a95, type: 3}
   Projectile: {fileID: 3498001305427266390, guid: 605737c2dc038964e8ec0a56bc850288, type: 3}
+  icon: {fileID: 21300000, guid: a1fdf09b54ffcca4199931f9ebce97b3, type: 3}
+  Order: 0
   ExplosionRadius: 1
   Damage: 35
   ProjectileStartForce: 100
@@ -22,3 +24,5 @@ MonoBehaviour:
   HasDelayBetweenShoots: 0
   DelayBetweenShoots: 0
   IsUsingEndsTurn: 1
+  IsChargeble: 1
+  ChargingTime: 1.2

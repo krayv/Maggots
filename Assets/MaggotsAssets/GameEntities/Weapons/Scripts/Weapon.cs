@@ -9,7 +9,9 @@ namespace Maggots
     {
         public WeaponSprite SpritePrefab;
         public Projectile Projectile;
+        public Sprite icon;
         [Tooltip("In Units")]
+        public int Order = 0;
         public float ExplosionRadius = 0.5f;
         public int Damage = 35;
         public float ProjectileStartForce = 100f;
@@ -19,7 +21,7 @@ namespace Maggots
         public float DelayBetweenShoots;
         public bool IsUsingEndsTurn = true;
         public bool IsChargeble = true;
-        public float ChargingTime = 1.2f;
+        public float ChargingTime = 1.2f;       
     }
 }
 

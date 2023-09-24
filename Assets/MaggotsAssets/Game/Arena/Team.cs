@@ -12,6 +12,15 @@ namespace Maggots
         private int currentMaggotIndex;
         private readonly List<Maggot> maggots;
 
+        private Inventory _inventory;
+
+        public Inventory Inventory
+        {
+            get
+            {
+                return _inventory;
+            }
+        }
         public List<Maggot> Maggots
         {
             get
@@ -20,10 +29,11 @@ namespace Maggots
             }
         }
 
-        public Team(List<Maggot> maggots, int number)
+        public Team(List<Maggot> maggots, int number, Dictionary<Weapon, int> startInventory)
         {
             this.maggots = maggots;
             this.number = number;
+            _inventory = new(startInventory);
         }
 
         public Maggot CurrentMaggot()

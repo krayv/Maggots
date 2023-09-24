@@ -10,7 +10,8 @@ namespace Maggots
         public List<Team> Teams;
         public ArenaController ArenaController;
         public CameraController CameraController;
-
+        public InputSystem InputSystem;
+        public Team CurrentTeam => ArenaController.CurrentTeam;
         public Action OnNewBattle;
     }
 }

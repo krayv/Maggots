@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
+using System;
 
 namespace Maggots
 {
@@ -13,5 +15,15 @@ namespace Maggots
         public Vector2 mapYBorders;
         public CameraController cameraController;
         public BezierCurve2D[] mapCurves;
+        public List<InitWeapon> weapons;
+
+        [Serializable]
+        public struct InitWeapon
+        {
+            public Weapon Weapon;
+            public int Count;
+        }
     }
+
+    
 }

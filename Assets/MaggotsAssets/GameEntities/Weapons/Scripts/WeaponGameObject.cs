@@ -19,6 +19,7 @@ namespace Maggots
         public Action<float> onChargeWeapon;
 
         public bool IsChargeble => weapon.IsChargeble;
+        public bool IsReady => currentSprite != null;
 
         private readonly List<Projectile> projectiles = new();
 

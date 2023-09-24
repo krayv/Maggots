@@ -128,8 +128,7 @@ MonoBehaviour:
   moveSettings:
     JumpForce: 10
     HorizontalMoveForce: 750
-  weapon: {fileID: 2163543135644551798}
-  weaponSO: {fileID: 11400000, guid: e651f4333b0158d4f962374644531065, type: 2}
+  weaponGO: {fileID: 2163543135644551798}
   stats:
     MaxLife: 100
   mainSprite: {fileID: 9173264829138120722}

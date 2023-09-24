@@ -15,6 +15,7 @@ namespace Maggots
         public UnityEvent JumpEvent;
         public UnityEvent FireStartEvent;
         public UnityEvent FireReleaseEvent;
+        public UnityEvent InventoryEvent;
 
         private readonly Dictionary<InputEventType, InputEvent> inputEvents = new();
         public void Init()
@@ -24,6 +25,7 @@ namespace Maggots
                 inputEvent.Init();
                 inputEvents[inputEvent.InputType] = inputEvent;
             }
+            DontDestroyOnLoad(gameObject);
         }
 
         private void Update()
@@ -43,6 +45,11 @@ namespace Maggots
             if (inputEvents[InputEventType.FireRelease].UpdateInput())
             {
                 FireReleaseEvent.Invoke();
+            }
+
+            if (inputEvents[InputEventType.Inventory].UpdateInput())
+            {
+                InventoryEvent.Invoke();
             }
         }
 

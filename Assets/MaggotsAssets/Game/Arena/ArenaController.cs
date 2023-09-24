@@ -15,7 +15,6 @@ namespace Maggots
         [SerializeField] private int teamsCount = 2;
         [SerializeField] private int maggotsPerTeam = 2;
         [SerializeField] private Maggot playerPrefab;
-        [SerializeField] private InputSystem inputSystem;       
         [SerializeField] private PlayerController playerController;
         [SerializeField] private BattleStarter battleStarter;
         [SerializeField] private ArenaData arenaData;
@@ -24,15 +23,16 @@ namespace Maggots
         private readonly List<Team> teams = new();
 
         private int currentTeamIndex = 0;
-        private Team CurrentTeam => teams[currentTeamIndex];
+        private InputSystem inputSystem;
+        public Team CurrentTeam => teams[currentTeamIndex];
 
         public Action<Team> OnChangeTeam;
         public Action<Maggot> OnChangeSelectedMaggot;
 
         private void Start()
         {
+            inputSystem = arenaData.InputSystem;
             cameraController = battleStarter.cameraController;
-            inputSystem.Init();
             playerController.Init(inputSystem);
             GenerateTerrain();
             SwitchToNewTeam();
@@ -71,17 +71,33 @@ namespace Maggots
             for (int i = 0; i < teamsCount; i++)
             {
                 List<Maggot> maggots = new();
-                Team team = new(maggots, i);
+                Dictionary<Weapon, int> startWeapons = new();
+                foreach (var weapon in battleStarter.weapons)
+                {
+                    if (weapon.Count > 0)
+                    {
+                        if (startWeapons.ContainsKey(weapon.Weapon))
+                        {
+                            startWeapons[weapon.Weapon] += weapon.Count;
+
+                        }
+                        else
+                        {
+                            startWeapons.Add(weapon.Weapon, weapon.Count);
+                        }
+                        
+                    }
+                }
+                Team team = new(maggots, i, startWeapons);
                 team.TeamColor = UnityEngine.Random.ColorHSV();
                 for (int j = 0; j < maggotsPerTeam; j++)
                 {
                     int indexPos = SelectRandomPointIndex(usedSpawnPoints);
                     usedSpawnPoints.Add(indexPos);
                     Maggot maggot = SpawnPlayer(spawnPoints[indexPos]);
-                    maggot.Init(this);
+                    maggot.Init(this, team);
                     maggot.OnDeath += OnPlayerDeath;
                     maggot.OnDeath += team.OnPlayerDeath;
-                    maggot.Team = team;
                     maggots.Add(maggot);
                 }
                 teams.Add(team);

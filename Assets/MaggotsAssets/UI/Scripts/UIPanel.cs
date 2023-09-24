@@ -25,6 +25,6 @@ namespace Maggots
 
     public enum UIPanelType
     {
-        MainMenu, MapPanel, BattleHUD
+        MainMenu, MapPanel, BattleHUD, Inventory
     }
 }

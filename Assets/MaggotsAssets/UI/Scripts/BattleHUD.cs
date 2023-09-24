@@ -23,6 +23,16 @@ namespace Maggots
             arenaData.OnNewBattle += SpawnInfo;
         }
 
+        private void OnEnable()
+        {
+            arenaData.InputSystem.InventoryEvent.AddListener(OpenInventory);
+        }
+
+        private void OnDisable()
+        {
+            arenaData.InputSystem.InventoryEvent.RemoveListener(OpenInventory);
+        }
+
         private void LateUpdate()
         {
             UpdateInfo();
@@ -43,6 +53,11 @@ namespace Maggots
         {
             arenaData.ArenaController.LeaveBattle();
             ui.OpenPanel(UIPanelType.MainMenu);
+        }
+
+        public void OpenInventory()
+        {
+            ui.OpenPanel(UIPanelType.Inventory, false);
         }
 
         private void SpawnInfo()

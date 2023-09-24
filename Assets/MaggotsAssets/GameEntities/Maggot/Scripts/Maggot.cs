@@ -1,14 +1,15 @@
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 
 namespace Maggots
 {
     public class Maggot : MonoBehaviour, IExplodable
     {
         [SerializeField] private RigidbodyMovement rigidbodyMovement;
-        [SerializeField] private PlayerMovementSettings moveSettings;       
-        [SerializeField] private WeaponGameObject weapon;
-        [SerializeField] private Weapon weaponSO;
+        [SerializeField] private PlayerMovementSettings moveSettings;
+        [SerializeField] private WeaponGameObject weaponGO;
+         
         [SerializeField] private MaggotStats stats;
         [SerializeField] private SpriteRenderer mainSprite;
         [SerializeField] private Animator mainAnimator;
@@ -29,6 +30,8 @@ namespace Maggots
         private MaggotBehaviour _stateBehaviour;
         private readonly float switchToAirStateDelay = 0.5f;
         private float currentSwitchDelay;
+        private Inventory Inventory => Team.Inventory;
+        private Weapon SelectedWeapon => Inventory.SelectedWeapon;
 
         public MaggotState State
         {
@@ -53,13 +56,13 @@ namespace Maggots
                 switch (value)
                 {
                     case MaggotState.Default:
-                        _stateBehaviour = new MaggotStateDefault(rigidbodyMovement, moveSettings, weapon, mainSprite, mainAnimator, capsuleCollider);
+                        _stateBehaviour = new MaggotStateDefault(rigidbodyMovement, moveSettings, weaponGO, mainSprite, mainAnimator, capsuleCollider);
                         break;
                     case MaggotState.InAir:
-                        _stateBehaviour = new MaggotStateInAir(rigidbodyMovement, moveSettings, weapon, mainSprite, mainAnimator);
+                        _stateBehaviour = new MaggotStateInAir(rigidbodyMovement, moveSettings, weaponGO, mainSprite, mainAnimator);
                         break;
                     case MaggotState.Shooting:
-                        _stateBehaviour = new MaggotStateShooting(rigidbodyMovement, moveSettings, weapon, mainSprite, mainAnimator);
+                        _stateBehaviour = new MaggotStateShooting(rigidbodyMovement, moveSettings, weaponGO, mainSprite, mainAnimator);
                         break;                    
                 }
                 currentSwitchDelay = switchToAirStateDelay;
@@ -91,6 +94,11 @@ namespace Maggots
             OnDestroyGO?.Invoke(this);
         }
 
+        private void OnDisable()
+        {
+            Inventory.OnChangeWeapon -= SelectWeapon;
+        }
+
         private void UpdateState()
         {
             if (State == MaggotState.Shooting)
@@ -116,13 +124,15 @@ namespace Maggots
             }
         }
 
-        public void Init(ArenaController gameController)
+        public void Init(ArenaController gameController, Team team)
         {
             gameController.OnChangeSelectedMaggot += OnChangeSelection;
             stats.OnZeroLife += OnZeroLife;
             stats.CurrentLife = stats.MaxLife;
             stats.OnChangeLife += ChangeLife;
             State = default;
+            Team = team;
+            Inventory.OnChangeWeapon += SelectWeapon;
         }
 
         public void Move(AxisInputEventArgs inputArgs)
@@ -139,6 +149,10 @@ namespace Maggots
 
         public void UseWeapon()
         {
+            if (!weaponGO.IsReady)
+            {
+                return;
+            }
             hasAction = true;
             if(!blockUsingNewWeapon)
                 _stateBehaviour.UseWeapon(OnStartChargingWeapon, OnEndChargingWeapon, OnStartUsingWeapon, OnEndUsingWeapon, OnUpdateChargeWeapon);
@@ -151,6 +165,10 @@ namespace Maggots
 
         public void UpdateWeaponDirection(Vector2 direction)
         {
+            if (!weaponGO.IsReady)
+            {
+                return;
+            }
             _stateBehaviour.UpdateWeaponDirection(direction);
         }
 
@@ -159,24 +177,42 @@ namespace Maggots
             stats.CurrentLife -= source.Damage;
         }
 
+        private void SelectWeapon(Weapon weapon)
+        {
+            if (Team.CurrentMaggot() != this)
+            {
+                return;
+            }
+            if (weapon == null)
+            {
+                weaponGO.RemoveWeapon();
+            }
+            else
+            {
+                weaponGO.SwitchWeapon(weapon);
+            }
+            
+        }
+
         private void OnStartChargingWeapon()
         {
             State = MaggotState.Shooting;
-            weapon.onStartCharging -= OnStartChargingWeapon;
+            weaponGO.onStartCharging -= OnStartChargingWeapon;
+            Inventory.RemoveWeapon(Inventory.SelectedWeapon, 1);
         }
         
         private void OnEndChargingWeapon()
         {
             State = MaggotState.Default;
-            weapon.onEndCharging -= OnEndChargingWeapon;
-            weapon.onChargeWeapon -= OnUpdateChargeWeapon;
+            weaponGO.onEndCharging -= OnEndChargingWeapon;
+            weaponGO.onChargeWeapon -= OnUpdateChargeWeapon;
             OnChargeWeapon.Invoke(this, 0f);
         }
 
         private void OnStartUsingWeapon()
         {
             blockUsingNewWeapon = true;
-            weapon.onUsing -= OnStartUsingWeapon;
+            weaponGO.onUsing -= OnStartUsingWeapon;
         }
 
         private void OnUpdateChargeWeapon(float progress)
@@ -187,7 +223,8 @@ namespace Maggots
         private void OnEndUsingWeapon(bool endTurn)
         {
             blockUsingNewWeapon = false;
-            weapon.onEndUsing -= OnEndUsingWeapon;           
+            weaponGO.onEndUsing -= OnEndUsingWeapon;
+            weaponGO.RemoveWeapon();
             if (endTurn)
             {
                 OnEndTurn?.Invoke(this);
@@ -198,11 +235,7 @@ namespace Maggots
         {
             if (maggot != this)
             {
-                weapon.RemoveWeapon();
-            }
-            else
-            {
-                weapon.SwitchWeapon(weaponSO);
+                weaponGO.RemoveWeapon();
             }
         }
 

@@ -15,3 +15,7 @@ MonoBehaviour:
   arenaScene: MaggotsAssets/Scenes/Arena
   mapXBorders: {x: 0, y: 0}
   mapYBorders: {x: 0, y: 0}
+  cameraController: {fileID: 0}
+  weapons:
+  - Weapon: {fileID: 11400000, guid: e651f4333b0158d4f962374644531065, type: 2}
+    Count: 3

@@ -50,7 +50,7 @@ namespace Maggots
 
     public enum InputEventType
     {
-        Left, Right, Up, Down, Jump, FireStart, FireRelease
+        Left, Right, Up, Down, Jump, FireStart, FireRelease, Inventory
     }
 
     public enum InputKeyPressType 
