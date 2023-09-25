@@ -21,6 +21,7 @@ namespace Maggots
 
         private void Update()
         {
+            transform.right = projectileRigidbody.velocity.normalized;
             if (weapon.MaxUnitDistanceFromCenter * weapon.MaxUnitDistanceFromCenter < transform.position.sqrMagnitude)
             {
                 Explode();
