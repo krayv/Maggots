@@ -8,8 +8,13 @@ namespace Maggots
         private GameObject trackObject;
 
         [SerializeField] private Vector2 maxSizeRange = new(4f, 25f);
+        [SerializeField] private float animationTime;
+        [SerializeField] AnimationCurve curve;
 
         public Camera LocalCamera;
+
+        private float currentTime = 0f;
+        private Vector2 startPosition;
 
         private void Awake()
         {
@@ -20,7 +25,17 @@ namespace Maggots
         {
             if (trackObject != null)
             {
-                transform.position = new Vector3(trackObject.transform.position.x, trackObject.transform.position.y, transform.position.z);
+                Vector3 targetPos = new(trackObject.transform.position.x, trackObject.transform.position.y, transform.position.z);
+                if (currentTime <= animationTime)
+                {
+                    Vector3 newPos = Vector3.Lerp(startPosition, targetPos, curve.Evaluate(currentTime / animationTime));
+                    transform.position = new Vector3(newPos.x, newPos.y, transform.position.z);
+                    currentTime += Time.deltaTime;
+                }
+                else
+                {
+                    transform.position = targetPos;
+                }              
             }
             
             if (Input.mouseScrollDelta.y != 0f)
@@ -31,6 +46,8 @@ namespace Maggots
 
         public void TrackNewObject(GameObject track)
         {
+            currentTime = 0f;
+            startPosition = transform.position;
             trackObject = track;
         }
     }
