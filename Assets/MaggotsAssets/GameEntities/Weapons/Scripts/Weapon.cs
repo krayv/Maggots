@@ -21,7 +21,9 @@ namespace Maggots
         public float DelayBetweenShoots;
         public bool IsUsingEndsTurn = true;
         public bool IsChargeble = true;
-        public float ChargingTime = 1.2f;       
+        public bool IsProjectileStabilized = true;
+        public float ChargingTime = 1.2f;
+        public float ExplodeDelay;
     }
 }
 

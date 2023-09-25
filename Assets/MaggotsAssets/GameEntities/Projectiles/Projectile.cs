@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.Collections;
 
 namespace Maggots
 {
@@ -12,25 +13,40 @@ namespace Maggots
 
         private Weapon weapon;
 
+
         public void Init(Weapon weapon, float chargeProgress)
         {
             float force = weapon.IsChargeble ? weapon.ProjectileStartForce * chargeProgress : weapon.ProjectileStartForce;
             projectileRigidbody.AddForce(transform.right * force);
             this.weapon = weapon;
+            if (weapon.ExplodeDelay > 0f)
+            {
+                StartCoroutine(ExplodeDelay());
+            }
         }
 
         private void Update()
         {
-            transform.right = projectileRigidbody.velocity.normalized;
+            if(weapon.IsProjectileStabilized)
+                transform.right = projectileRigidbody.velocity.normalized;
             if (weapon.MaxUnitDistanceFromCenter * weapon.MaxUnitDistanceFromCenter < transform.position.sqrMagnitude)
             {
                 Explode();
             }
         }
 
+        private IEnumerator ExplodeDelay()
+        {
+            yield return new WaitForSeconds(weapon.ExplodeDelay);
+            Explode();
+        }
+
         private void OnCollisionEnter2D(Collision2D collision)
         {
-            Explode();
+            if (weapon.ExplodeDelay == 0f)
+            {
+                Explode();
+            }          
         }
         private void Explode()
         {

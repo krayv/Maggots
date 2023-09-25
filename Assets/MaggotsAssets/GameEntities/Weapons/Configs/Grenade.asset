@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fed4907aca19c354395e222b719b474e, type: 3}
-  m_Name: Bazooka
+  m_Name: Grenade
   m_EditorClassIdentifier: 
-  SpritePrefab: {fileID: 4498435536623022481, guid: 27a0dd1cec17ed04bbb18ae40c341a95, type: 3}
-  Projectile: {fileID: 3498001305427266390, guid: 605737c2dc038964e8ec0a56bc850288, type: 3}
-  icon: {fileID: 21300000, guid: a1fdf09b54ffcca4199931f9ebce97b3, type: 3}
-  Order: 0
-  ExplosionRadius: 1
-  Damage: 35
+  SpritePrefab: {fileID: 4498435536623022481, guid: d0cdabfded7db2e44b5978c7613967e2, type: 3}
+  Projectile: {fileID: 3498001305427266390, guid: cf7a421e8d0e02d42ab1cf6c9e9a678c, type: 3}
+  icon: {fileID: 21300000, guid: 63dd39612f9853e479cc3564d325309f, type: 3}
+  Order: 1
+  ExplosionRadius: 1.25
+  Damage: 50
   ProjectileStartForce: 100
   MaxUnitDistanceFromCenter: 100
   ProjectilesCount: 1
@@ -25,6 +25,6 @@ MonoBehaviour:
   DelayBetweenShoots: 0
   IsUsingEndsTurn: 1
   IsChargeble: 1
-  IsProjectileStabilized: 1
+  IsProjectileStabilized: 0
   ChargingTime: 1.2
-  ExplodeDelay: 0
+  ExplodeDelay: 6
