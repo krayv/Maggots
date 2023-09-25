@@ -175,6 +175,7 @@ namespace Maggots
         public void OnExplosion(Vector2 pointOfExplosion, Weapon source)
         {
             stats.CurrentLife -= source.Damage;
+            rigidbodyMovement.MoveByDirection(((Vector2)transform.position - pointOfExplosion).normalized, Space.Self, source.Damage * source.ForcePerDamage, ForceMode2D.Impulse);
         }
 
         private void SelectWeapon(Weapon weapon)

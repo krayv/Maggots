@@ -13,6 +13,7 @@ namespace Maggots
         [Tooltip("In Units")]
         public int Order = 0;
         public float ExplosionRadius = 0.5f;
+        public float ForcePerDamage = 0.5f;
         public int Damage = 35;
         public float ProjectileStartForce = 100f;
         public float MaxUnitDistanceFromCenter = 100f;
