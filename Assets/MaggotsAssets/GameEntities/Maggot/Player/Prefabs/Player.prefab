@@ -212,6 +212,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weapon: {fileID: 11400000, guid: e651f4333b0158d4f962374644531065, type: 2}
   weaponSpritePoint: {fileID: 8683880264902708458}
+  arenaData: {fileID: 11400000, guid: 633a2862d0e9d784c8f38640aa655d8f, type: 2}
 --- !u!1 &5933650667540539477
 GameObject:
   m_ObjectHideFlags: 0

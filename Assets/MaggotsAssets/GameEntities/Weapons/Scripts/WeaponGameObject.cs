@@ -9,6 +9,7 @@ namespace Maggots
     {
         [SerializeField] private Weapon weapon;
         [SerializeField] private Transform weaponSpritePoint;
+        [SerializeField] private ArenaData arenaData;
 
         private WeaponSprite currentSprite;
 
@@ -59,7 +60,7 @@ namespace Maggots
             {
                 for (int i = 0; i < weapon.ProjectilesCount; i++)
                 {
-                    SpawnProjectile(weapon.Projectile);
+                    SpawnProjectile(weapon.Projectile, i == weapon.ProjectilesCount - 1);
                 }
             }
             else
@@ -73,7 +74,7 @@ namespace Maggots
             int i = 0;
             while (i < weapon.ProjectilesCount)
             {
-                SpawnProjectile(weapon.Projectile);
+                SpawnProjectile(weapon.Projectile, i == weapon.ProjectilesCount - 1);
                 yield return new WaitForSeconds(weapon.DelayBetweenShoots);
                 i++;
             }      
@@ -103,12 +104,16 @@ namespace Maggots
             }            
         }
 
-        private void SpawnProjectile(Projectile projectilePrefab)
+        private void SpawnProjectile(Projectile projectilePrefab, bool lockCamera)
         {
             Projectile projectile = Instantiate(projectilePrefab);
             projectile.transform.SetPositionAndRotation(currentSprite.projectileStartPoint.transform.position, weaponSpritePoint.rotation);
             projectile.Init(weapon, chargeProgress / weapon.ChargingTime);
             projectile.OnExplode += OnProjectileExplode;
+            if (lockCamera)
+            {
+                arenaData.CameraController.TrackNewObject(projectile.gameObject);
+            }
             projectiles.Add(projectile);
         }
 

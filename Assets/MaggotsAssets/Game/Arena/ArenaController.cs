@@ -18,6 +18,7 @@ namespace Maggots
         [SerializeField] private PlayerController playerController;
         [SerializeField] private BattleStarter battleStarter;
         [SerializeField] private ArenaData arenaData;
+        [SerializeField] private float nextTurnDelay = .5f;
 
         private CameraController cameraController;
         private readonly List<Team> teams = new();
@@ -35,7 +36,7 @@ namespace Maggots
             cameraController = battleStarter.cameraController;
             playerController.Init(inputSystem);
             GenerateTerrain();
-            SwitchToNewTeam();
+            SwitchToNewTeam(false);
             arenaData.ArenaController = this;
             arenaData.Teams = teams;
             arenaData.CameraController = cameraController;
@@ -49,7 +50,7 @@ namespace Maggots
             {
                 currentTeamIndex = 0;
             }
-            SwitchToNewTeam(true);
+            SwitchToNewTeam(true, true);
         }
 
         public void LeaveBattle()
@@ -118,13 +119,20 @@ namespace Maggots
             return randomIndex;
         }
 
-        private void SwitchToNewTeam(bool nextMaggot = false)
+        private void SwitchToNewTeam(bool withDelay, bool nextMaggot = false)
         {
             Maggot currentMaggot = nextMaggot ? CurrentTeam.GetNextMaggot() : CurrentTeam.CurrentMaggot();
-            playerController.TrackNewMovement(new List<Maggot>() { currentMaggot });
-            currentMaggot.OnEndTurn += OnPlayerEndTurn;
-            TrackNewObject(currentMaggot.gameObject);
-            OnChangeSelectedMaggot.Invoke(currentMaggot);
+            playerController.TrackNewMovement(new List<Maggot>());
+            StartCoroutine(DelayedSwitchingToNextPlayer(currentMaggot, withDelay? nextTurnDelay : 0f));
+        }
+
+        private IEnumerator DelayedSwitchingToNextPlayer(Maggot maggot, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            playerController.TrackNewMovement(new List<Maggot>() { maggot });
+            maggot.OnEndTurn += OnPlayerEndTurn;
+            TrackNewObject(maggot.gameObject);
+            OnChangeSelectedMaggot.Invoke(maggot);
         }
 
         private void TrackNewObject(GameObject newTrackObject)
