@@ -132,6 +132,7 @@ namespace Maggots
             stats.OnChangeLife += ChangeLife;
             State = default;
             Team = team;
+            stats.MaxLife = team.HealthPerCharacter;
             Inventory.OnChangeWeapon += SelectWeapon;
         }
 

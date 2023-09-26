@@ -6,11 +6,14 @@ namespace Maggots
 {
     public class Team
     {
-        public int number;
-        public string TeamName => "Player " + number;
+        public int Number;
+        public int CharacterCounts;
+        public int HealthPerCharacter;
+
+        public string TeamName;
         public Color TeamColor = Color.white;
         private int currentMaggotIndex;
-        private readonly List<Maggot> maggots;
+        private List<Maggot> maggots;
 
         private Inventory _inventory;
 
@@ -29,11 +32,16 @@ namespace Maggots
             }
         }
 
-        public Team(List<Maggot> maggots, int number, Dictionary<Weapon, int> startInventory)
+        public Team(string teamName, Dictionary<Weapon, int> startInventory)
+        {
+
+            this.TeamName = teamName;
+            _inventory = new(startInventory);
+        }
+
+        public void SetSpawnedMaggots(List<Maggot> maggots)
         {
             this.maggots = maggots;
-            this.number = number;
-            _inventory = new(startInventory);
         }
 
         public Maggot CurrentMaggot()

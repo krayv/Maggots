@@ -12,8 +12,6 @@ namespace Maggots
         private List<Vector2> spawnPoints;
 
         [SerializeField] private Terrain terrain;
-        [SerializeField] private int teamsCount = 2;
-        [SerializeField] private int maggotsPerTeam = 2;
         [SerializeField] private Maggot playerPrefab;
         [SerializeField] private PlayerController playerController;
         [SerializeField] private BattleStarter battleStarter;
@@ -69,29 +67,12 @@ namespace Maggots
         private void SpawnPlayers()
         {
             List<int> usedSpawnPoints = new List<int>(); 
-            for (int i = 0; i < teamsCount; i++)
+            for (int i = 0; i < battleStarter.Teams.Count; i++)
             {
                 List<Maggot> maggots = new();
-                Dictionary<Weapon, int> startWeapons = new();
-                foreach (var weapon in battleStarter.weapons)
-                {
-                    if (weapon.Count > 0)
-                    {
-                        if (startWeapons.ContainsKey(weapon.Weapon))
-                        {
-                            startWeapons[weapon.Weapon] += weapon.Count;
-
-                        }
-                        else
-                        {
-                            startWeapons.Add(weapon.Weapon, weapon.Count);
-                        }
-                        
-                    }
-                }
-                Team team = new(maggots, i, startWeapons);
-                team.TeamColor = UnityEngine.Random.ColorHSV();
-                for (int j = 0; j < maggotsPerTeam; j++)
+                
+                Team team = battleStarter.Teams[i];
+                for (int j = 0; j < team.CharacterCounts; j++)
                 {
                     int indexPos = SelectRandomPointIndex(usedSpawnPoints);
                     usedSpawnPoints.Add(indexPos);
@@ -101,6 +82,7 @@ namespace Maggots
                     maggot.OnDeath += team.OnPlayerDeath;
                     maggots.Add(maggot);
                 }
+                team.SetSpawnedMaggots(maggots);
                 teams.Add(team);
             }            
         }

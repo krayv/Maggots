@@ -16,6 +16,7 @@ namespace Maggots
         public CameraController cameraController;
         public BezierCurve2D[] mapCurves;
         public List<InitWeapon> weapons;
+        public List<Team> Teams;
 
         [Serializable]
         public struct InitWeapon
