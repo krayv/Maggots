@@ -128,11 +128,12 @@ namespace Maggots
         {
             gameController.OnChangeSelectedMaggot += OnChangeSelection;
             stats.OnZeroLife += OnZeroLife;
+            stats.MaxLife = team.HealthPerCharacter;
             stats.CurrentLife = stats.MaxLife;
             stats.OnChangeLife += ChangeLife;
             State = default;
             Team = team;
-            stats.MaxLife = team.HealthPerCharacter;
+            
             Inventory.OnChangeWeapon += SelectWeapon;
         }
 

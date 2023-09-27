@@ -34,15 +34,7 @@ namespace Maggots
             startBattleButton.onClick.AddListener(StartBattle);
             addTeamButton.onClick.AddListener(AddTeam);
             removeTeamButton.onClick.AddListener(RemoveTeam);
-        }
-
-        private void Start()
-        {
-            for (int i = 0; i < 2; i++)
-            {
-                AddTeam(i);
-            }
-        }
+        }      
 
         private void OnEnable()
         {         
@@ -53,9 +45,18 @@ namespace Maggots
         {
             foreach (var team in teams)
             {
-                Destroy(team.Value);       
+                Destroy(team.Value.gameObject);       
             }
             teams.Clear();
+        }
+
+        public override void Open()
+        {
+            base.Open();
+            for (int i = 0; i < 2; i++)
+            {
+                AddTeam(i);
+            }
         }
 
         public void GenerateMap()
@@ -78,7 +79,7 @@ namespace Maggots
         {
             TeamSettings teamSettings = Instantiate(teamSettingsPrefab, teamSettingsContainer);
 
-            string teamName = "Player " + i.ToString();
+            string teamName = "Player " + (i + 1).ToString();
             Dictionary<Weapon, int> startWeapons = new();
             foreach (var weapon in battleStarter.weapons)
             {

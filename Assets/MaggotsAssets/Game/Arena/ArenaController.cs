@@ -132,12 +132,27 @@ namespace Maggots
         private void OnPlayerEndTurn(Maggot maggot)
         {
             maggot.OnEndTurn -= OnPlayerEndTurn;
-            NextTurn();
+            if (teams.Where(t => !t.TeamLost).Count() > 1)
+            {
+                NextTurn();               
+            }
+            else
+            {
+                StartCoroutine(EndBattle(1f));
+            }
+            
         }
 
         private void OnPlayerDeath(Maggot maggot)
         {
             maggot.OnDeath -= OnPlayerDeath;
+        }
+
+        private IEnumerator EndBattle(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            playerController.TrackNewMovement(new List<Maggot>());
+            arenaData.OnEndBattle.Invoke();
         }
     }
 }

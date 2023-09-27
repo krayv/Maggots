@@ -21,6 +21,7 @@ namespace Maggots
         {
             leaveButton.onClick.AddListener(LeaveBattle);
             arenaData.OnNewBattle += SpawnInfo;
+            arenaData.OnEndBattle += OnEndBattle;
         }
 
         private void OnEnable()
@@ -49,6 +50,12 @@ namespace Maggots
             infos.Clear();
         }
 
+        public override void Open()
+        {
+            base.Open();
+            
+        }
+
         public void LeaveBattle()
         {
             arenaData.ArenaController.LeaveBattle();
@@ -58,6 +65,11 @@ namespace Maggots
         public void OpenInventory()
         {
             ui.OpenPanel(UIPanelType.Inventory, false);
+        }
+
+        private void OnEndBattle()
+        {
+            ui.OpenPanel(UIPanelType.ResultPanel);
         }
 
         private void SpawnInfo()

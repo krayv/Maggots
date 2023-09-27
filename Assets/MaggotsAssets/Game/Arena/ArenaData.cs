@@ -13,6 +13,7 @@ namespace Maggots
         public InputSystem InputSystem;
         public Team CurrentTeam => ArenaController.CurrentTeam;
         public Action OnNewBattle;
+        public Action OnEndBattle;
     }
 }
 

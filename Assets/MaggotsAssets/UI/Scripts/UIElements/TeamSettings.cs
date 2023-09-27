@@ -35,6 +35,7 @@ namespace Maggots
             TeamColor = Random.ColorHSV();
             team.CharacterCounts = charactersCountSetting.Value;
             team.HealthPerCharacter = hpPerCharacterSetting.Value;
+            teamTitle.text = team.TeamName;
         }
 
         private void Awake()

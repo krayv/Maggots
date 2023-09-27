@@ -15,6 +15,13 @@ namespace Maggots
         private int currentMaggotIndex;
         private List<Maggot> maggots;
 
+        public bool TeamLost
+        {
+            get
+            {
+                return maggots.Count <= 0;
+            }
+        }
         private Inventory _inventory;
 
         public Inventory Inventory
@@ -46,11 +53,21 @@ namespace Maggots
 
         public Maggot CurrentMaggot()
         {
+            if (TeamLost)
+            {
+                return null;
+            }
+
             return maggots[currentMaggotIndex];
         }
 
         public Maggot GetNextMaggot()
         {
+            if (TeamLost)
+            {
+                return null;
+            }
+
             if (currentMaggotIndex >= maggots.Count - 1)
             {
                 currentMaggotIndex = 0;
