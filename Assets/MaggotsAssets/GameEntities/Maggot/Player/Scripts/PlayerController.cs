@@ -35,7 +35,9 @@ namespace Maggots
 
         public void TrackNewMovement(List<Maggot> maggots)
         {
+            trackedMaggots?.ForEach(m => m.OnDeath -= OnMaggotDeath);
             trackedMaggots = maggots;
+            trackedMaggots.ForEach(m => m.OnDeath += OnMaggotDeath);
         }
 
         public void OnHorizontalAxis(AxisInputEventArgs inputArgs)
@@ -68,6 +70,16 @@ namespace Maggots
             {
                 maggot.Jump();
             }                      
+        }
+
+        private void OnMaggotDeath(Maggot maggot)
+        {
+            maggot.OnDeath -= OnMaggotDeath;
+            trackedMaggots.Remove(maggot);
+            //if (trackedMaggots.Count == 0)
+            //{
+            //    maggot.OnEndTurn.Invoke(maggot);
+            //}
         }
     }
 }

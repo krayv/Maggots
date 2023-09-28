@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Maggots
 {
-    public class Maggot : MonoBehaviour, IExplodable
+    public class Maggot : MonoBehaviour, IExplodable, IDrowable
     {
         [SerializeField] private RigidbodyMovement rigidbodyMovement;
         [SerializeField] private PlayerMovementSettings moveSettings;
@@ -180,6 +180,11 @@ namespace Maggots
             rigidbodyMovement.MoveByDirection(((Vector2)transform.position - pointOfExplosion).normalized, Space.Self, source.Damage * source.ForcePerDamage, ForceMode2D.Impulse);
         }
 
+        public void Drow()
+        {
+            OnZeroLife();
+        }
+
         private void SelectWeapon(Weapon weapon)
         {
             if (Team.CurrentMaggot() != this)
@@ -246,6 +251,7 @@ namespace Maggots
         {
             stats.OnZeroLife -= OnZeroLife;
             OnDeath.Invoke(this);
+            OnEndTurn?.Invoke(this);
             GameObject.Destroy(gameObject);
         }
 
@@ -253,8 +259,7 @@ namespace Maggots
         {
             OnChangeLife.Invoke(this);
         }
-
-
+       
         [Serializable]
         public struct PlayerMovementSettings
         {

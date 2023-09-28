@@ -21,7 +21,15 @@ namespace Maggots
         public override void Open()
         {
             base.Open();
-            winnerText.text  = arenaData.Teams.First(t => !t.TeamLost).TeamName;
+            Team winner = arenaData.Teams.First(t => !t.TeamLost);
+            if (winner != null)
+            {
+                winnerText.text = winner.TeamName + " won!";
+            }
+            else
+            {
+                winnerText.text = "Draw!";
+            }
         }
 
         private void OpenMainMenu()
