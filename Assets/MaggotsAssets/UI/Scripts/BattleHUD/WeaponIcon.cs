@@ -24,7 +24,15 @@ namespace Maggots
         {
             this.weapon = weapon;
             icon.sprite = weapon.icon;
-            countText.text = count.ToString();
+            if (count > 100)
+            {
+                countText.gameObject.SetActive(false);
+            }
+            else
+            {
+                countText.gameObject.SetActive(true);
+                countText.text = count.ToString();
+            }
         }
 
         public void Select()

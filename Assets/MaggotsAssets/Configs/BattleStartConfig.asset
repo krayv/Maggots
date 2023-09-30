@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: BattleStartConfig
   m_EditorClassIdentifier: 
   arenaScene: MaggotsAssets/Scenes/Arena
-  mapXBorders: {x: 0, y: 13.596654}
-  mapYBorders: {x: -4.484064, y: 1.5379605}
+  mapXBorders: {x: 0, y: 12.384602}
+  mapYBorders: {x: -4.784403, y: 0.7407207}
   cameraController: {fileID: 0}
   weapons:
   - Weapon: {fileID: 11400000, guid: e651f4333b0158d4f962374644531065, type: 2}
-    Count: 3
+    Count: 100000
   - Weapon: {fileID: 11400000, guid: 3e483d72a7acc5e43b887e684775aa85, type: 2}
-    Count: 3
+    Count: 100000
