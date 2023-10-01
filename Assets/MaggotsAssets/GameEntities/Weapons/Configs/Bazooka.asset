@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SpritePrefab: {fileID: 4498435536623022481, guid: 27a0dd1cec17ed04bbb18ae40c341a95, type: 3}
   Projectile: {fileID: 3498001305427266390, guid: 605737c2dc038964e8ec0a56bc850288, type: 3}
-  icon: {fileID: 21300000, guid: a1fdf09b54ffcca4199931f9ebce97b3, type: 3}
+  icon: {fileID: 21300000, guid: e20c38d46c9f43046be0efecb925154d, type: 3}
   Order: 0
   ExplosionRadius: 1.5
   ForcePerDamage: 0.5
