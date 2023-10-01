@@ -4,7 +4,7 @@ using System.Collections;
 
 namespace Maggots
 {
-    public class Projectile : MonoBehaviour
+    public class Projectile : MonoBehaviour, IDrowable
     {
         [SerializeField] private Rigidbody2D projectileRigidbody;
         [SerializeField] private Collider2D projectileCollider;
@@ -65,6 +65,15 @@ namespace Maggots
         private void OnDestroy()
         {
             OnExplode.Invoke(this);
+        }
+
+        public void Drow()
+        {
+            if (weapon.ExplodeDelay > 0f)
+            {
+                StopCoroutine(ExplodeDelay());
+            }
+            Explode();
         }
     }
 }

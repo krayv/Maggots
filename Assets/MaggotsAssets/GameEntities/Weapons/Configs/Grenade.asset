@@ -16,7 +16,8 @@ MonoBehaviour:
   Projectile: {fileID: 3498001305427266390, guid: cf7a421e8d0e02d42ab1cf6c9e9a678c, type: 3}
   icon: {fileID: 21300000, guid: 63dd39612f9853e479cc3564d325309f, type: 3}
   Order: 1
-  ExplosionRadius: 1.25
+  ExplosionRadius: 2.5
+  ForcePerDamage: 0.5
   Damage: 50
   ProjectileStartForce: 100
   MaxUnitDistanceFromCenter: 100
@@ -27,4 +28,4 @@ MonoBehaviour:
   IsChargeble: 1
   IsProjectileStabilized: 0
   ChargingTime: 1.2
-  ExplodeDelay: 6
+  ExplodeDelay: 4

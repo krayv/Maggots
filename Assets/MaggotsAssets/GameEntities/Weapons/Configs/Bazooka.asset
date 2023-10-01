@@ -16,7 +16,8 @@ MonoBehaviour:
   Projectile: {fileID: 3498001305427266390, guid: 605737c2dc038964e8ec0a56bc850288, type: 3}
   icon: {fileID: 21300000, guid: a1fdf09b54ffcca4199931f9ebce97b3, type: 3}
   Order: 0
-  ExplosionRadius: 1
+  ExplosionRadius: 1.5
+  ForcePerDamage: 0.5
   Damage: 35
   ProjectileStartForce: 100
   MaxUnitDistanceFromCenter: 100
