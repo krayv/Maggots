@@ -12,6 +12,7 @@ namespace Maggots
         [SerializeField] ArenaData arenaData;
         [SerializeField] private TextMeshProUGUI winnerText;
         [SerializeField] Button mainMenuButton;
+        [SerializeField] Image flag;
 
         private void Awake()
         {
@@ -25,6 +26,7 @@ namespace Maggots
             if (winner != null)
             {
                 winnerText.text = winner.TeamName + " won!";
+                flag.color = winner.TeamColor;
             }
             else
             {

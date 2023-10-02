@@ -104,8 +104,12 @@ namespace Maggots
 
         private void RemoveTeam()
         {
+            if (teams.Count < 3)
+            {
+                return;
+            }
             var team = teams.Last();
-            Destroy(team.Value);
+            Destroy(team.Value.gameObject);
             teams.Remove(team.Key);
         }
 
@@ -131,8 +135,9 @@ namespace Maggots
         {
             battleStarter.cameraController = Camera.main.GetComponent<CameraController>();
             battleStarter.Teams = teams.Select(t => t.Key).ToList();
-            ui.OpenPanel(UIPanelType.BattleHUD);
-            SceneManager.LoadScene(battleStarter.ArenaScene, LoadSceneMode.Additive);
+            var load = SceneManager.LoadSceneAsync(battleStarter.ArenaScene, LoadSceneMode.Additive);
+            Close();
+            load.completed += (op) => { ui.OpenPanel(UIPanelType.BattleHUD); };
         }
     }
 

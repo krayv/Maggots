@@ -15,6 +15,7 @@ namespace Maggots
         private void Awake()
         {
             startButton.onClick.AddListener(OnStartButtonClick);
+            exitButton.onClick.AddListener(OnExitButtonClick);
         }
 
         private void OnStartButtonClick()
@@ -24,7 +25,7 @@ namespace Maggots
 
         private void OnExitButtonClick()
         {
-
+            Application.Quit();
         }
     }
 }
