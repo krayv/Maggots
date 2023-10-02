@@ -160,6 +160,14 @@ namespace Maggots
                 _stateBehaviour.UseWeapon(OnStartChargingWeapon, OnEndChargingWeapon, OnStartUsingWeapon, OnEndUsingWeapon, OnUpdateChargeWeapon);
         }
 
+        public void OnOpenInventory()
+        {
+            if (weaponGO.IsReady)
+            {
+                weaponGO.RemoveWeapon();
+            }
+        }
+
         public void ReleaseFire()
         {
             _stateBehaviour.ReleaseFire();

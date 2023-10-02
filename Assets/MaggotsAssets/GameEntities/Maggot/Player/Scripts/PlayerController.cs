@@ -17,6 +17,7 @@ namespace Maggots
             inputSystem.JumpEvent.AddListener(OnJumpInput);
             inputSystem.FireStartEvent.AddListener(OnFireInput);
             inputSystem.FireReleaseEvent.AddListener(OnReleaseFireInput);
+            inputSystem.InventoryEvent.AddListener(OnInventoryInput);
         }
 
         private void Update()
@@ -70,6 +71,14 @@ namespace Maggots
             {
                 maggot.Jump();
             }                      
+        }
+
+        public void OnInventoryInput()
+        {
+            foreach (var maggot in trackedMaggots)
+            {
+                maggot.OnOpenInventory();
+            }
         }
 
         private void OnMaggotDeath(Maggot maggot)
